@@ -1,0 +1,69 @@
+{% extends "user/base.html" %}
+{% block title %}My Videos{% endblock %}
+{% block breadcrumb %}My Videos{% endblock %}
+{% block content %}
+<div class="user-page-header">
+    <div class="header-row">
+        <div>
+            <h1>My Videos</h1>
+            <p>Manage your uploaded video library. Preview files and submit them for deepfake detection analysis.</p>
+        </div>
+        <a href="{{ url_for('user.upload_video') }}" class="btn btn-primary">+ Upload New Video</a>
+    </div>
+</div>
+
+<div class="user-card">
+    <div class="user-card-body" style="padding:0;">
+        {% if pagination.items %}
+        <div class="user-table-wrap">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Format</th>
+                        <th>Size</th>
+                        <th>Duration</th>
+                        <th>Uploaded</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in pagination.items %}
+                    <tr>
+                        <td><strong>#{{ '%04d'|format(v.id) }}</strong></td>
+                        <td>{{ v.title }}</td>
+                        <td>{{ v.category.name if v.category else 'Uncategorized' }}</td>
+                        <td>{{ v.format|upper }}</td>
+                        <td>{{ (v.file_size / 1024 / 1024)|round(2) if v.file_size else '—' }} MB</td>
+                        <td>{{ v.duration|round(1) if v.duration else '—' }}s</td>
+                        <td>{{ v.created_at.strftime('%d %b %Y') }}</td>
+                        <td><span class="status-pill completed">{{ v.status }}</span></td>
+                        <td class="d-flex gap-1">
+                            <a href="{{ url_for('user.video_preview', video_id=v.id) }}" class="btn btn-sm btn-primary">Preview</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if pagination.pages > 1 %}
+        <div class="pagination" style="padding:1rem;">
+            {% for p in pagination.iter_pages() %}
+                {% if p %}<a href="?page={{ p }}" class="{{ 'active' if p==pagination.page }}">{{ p }}</a>{% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">&#9654;</div>
+            <h4>No videos in your library</h4>
+            <p>Upload a video to begin deepfake detection analysis.</p>
+            <a href="{{ url_for('user.upload_video') }}" class="btn btn-primary">Upload Video</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

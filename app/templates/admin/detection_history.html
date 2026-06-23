@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% block title %}Detection History{% endblock %}
+{% block breadcrumb %}Detection History{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>Detection History</h1><p>Historical log of all completed and failed detection operations across the system.</p></div>
+<div class="admin-card"><div class="admin-card-body" style="padding:0;">
+    {% if items %}
+    <table class="admin-table">
+        <thead><tr><th>Detection ID</th><th>User ID</th><th>Result</th><th>Confidence</th><th>Status</th><th>Timestamp</th></tr></thead>
+        <tbody>{% for item in items %}<tr>
+            <td><a href="{{ url_for('admin.detection_detail', det_id=item.detection_id) }}"><strong>#{{ '%04d'|format(item.detection_id) }}</strong></a></td>
+            <td>#{{ item.user_id }}</td>
+            <td>{% if item.result_label %}<span class="admin-pill {{ item.result_label }}">{{ item.result_label|upper }}</span>{% else %}—{% endif %}</td>
+            <td>{% if item.confidence %}<strong>{{ item.confidence }}%</strong>{% else %}—{% endif %}</td>
+            <td><span class="admin-pill {{ item.status }}">{{ item.status }}</span></td>
+            <td>{{ item.created_at.strftime('%d %b %Y, %H:%M:%S') }}</td>
+        </tr>{% endfor %}</tbody>
+    </table>
+    {% else %}<div class="empty-state"><p class="text-muted">No detection history.</p></div>{% endif %}
+</div></div>
+{% endblock %}

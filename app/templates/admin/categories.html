@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+{% block title %}Categories{% endblock %}
+{% block breadcrumb %}Video Categories{% endblock %}
+{% block content %}
+<div class="admin-page-header">
+    <div class="header-row">
+        <div><h1>Manage Video Categories</h1><p>Organize uploaded videos into categories for better content classification.</p></div>
+        <a href="{{ url_for('admin.add_category') }}" class="btn btn-primary">+ Add Category</a>
+    </div>
+</div>
+<div class="admin-card"><div class="admin-card-body" style="padding:0;">
+    {% if categories %}
+    <table class="admin-table">
+        <thead><tr><th>ID</th><th>Category Name</th><th>Description</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody>{% for cat in categories %}<tr>
+            <td><strong>#{{ cat.id }}</strong></td><td><strong>{{ cat.name }}</strong></td><td>{{ cat.description or '—' }}</td>
+            <td>{{ cat.created_at.strftime('%d %b %Y') }}</td>
+            <td class="d-flex gap-1">
+                <a href="{{ url_for('admin.edit_category', cat_id=cat.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                <form method="POST" action="{{ url_for('admin.delete_category', cat_id=cat.id) }}" onsubmit="return confirm('Delete category?')"><button class="btn btn-sm btn-danger">Delete</button></form>
+            </td>
+        </tr>{% endfor %}</tbody>
+    </table>
+    {% else %}<div class="empty-state"><div class="empty-icon">&#9776;</div><h4>No categories</h4><p>Create your first video category.</p><a href="{{ url_for('admin.add_category') }}" class="btn btn-primary">Add Category</a></div>{% endif %}
+</div></div>
+{% endblock %}

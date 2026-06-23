@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %}
+{% block title %}User: {{ user.username }}{% endblock %}
+{% block breadcrumb %}User Details{% endblock %}
+{% block content %}
+<div class="admin-page-header">
+    <div class="header-row">
+        <div>
+            <h1>{{ user.full_name or user.username }}</h1>
+            <p>Complete user profile, activity summary, and detection history.</p>
+        </div>
+        <div class="d-flex gap-1">
+            <form method="POST" action="{{ url_for('admin.toggle_user', user_id=user.id) }}"><button class="btn btn-warning btn-sm">{{ 'Deactivate Account' if user.is_active_account else 'Activate Account' }}</button></form>
+            <a href="{{ url_for('admin.users') }}" class="btn btn-outline btn-sm">Back to Users</a>
+        </div>
+    </div>
+</div>
+
+<div class="admin-stats" style="grid-template-columns:repeat(4,1fr);">
+    <div class="admin-stat-card" style="--stat-color:#6366f1;"><div class="stat-label">Total Detections</div><div class="stat-value">{{ user_stats.detections }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#8b5cf6;"><div class="stat-label">Videos Uploaded</div><div class="stat-value">{{ user_stats.videos }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#059669;"><div class="stat-label">Real Results</div><div class="stat-value">{{ user_stats.real }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#dc2626;"><div class="stat-label">Fake Results</div><div class="stat-value">{{ user_stats.fake }}</div></div>
+</div>
+
+<div class="profile-layout-admin">
+    <div class="admin-card">
+        <div class="admin-card-body" style="text-align:center;padding:2rem 1.25rem;">
+            <div class="admin-avatar lg">{{ (user.full_name or user.username)[:2]|upper }}</div>
+            <h3 style="font-size:1.1rem;font-weight:700;">{{ user.full_name or user.username }}</h3>
+            <p class="text-muted" style="font-size:.85rem;">@{{ user.username }}</p>
+            <span class="admin-pill {% if user.is_active_account %}success{% else %}danger{% endif %}" style="margin-top:.5rem;">{{ 'Active Account' if user.is_active_account else 'Inactive Account' }}</span>
+            <div class="detail-list mt-2" style="text-align:left;">
+                <div class="detail-row"><span class="label">Email</span><span class="value">{{ user.email }}</span></div>
+                <div class="detail-row"><span class="label">Phone</span><span class="value">{{ user.phone or 'Not set' }}</span></div>
+                <div class="detail-row"><span class="label">User ID</span><span class="value">#{{ user.id }}</span></div>
+                <div class="detail-row"><span class="label">Registered</span><span class="value">{{ user.created_at.strftime('%d %b %Y, %H:%M') }}</span></div>
+                <div class="detail-row"><span class="label">Last Updated</span><span class="value">{{ user.updated_at.strftime('%d %b %Y') if user.updated_at else '—' }}</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="admin-card mb-2">
+            <div class="admin-card-header"><div><h3>Detection History</h3><span class="card-sub">Recent analysis requests by this user</span></div></div>
+            <div class="admin-card-body" style="padding:0;">
+                {% if detections %}
+                <table class="admin-table">
+                    <thead><tr><th>ID</th><th>Type</th><th>Result</th><th>Confidence</th><th>Status</th><th>Date</th><th></th></tr></thead>
+                    <tbody>{% for d in detections %}<tr>
+                        <td>#{{ '%04d'|format(d.id) }}</td><td>{{ d.request_type|capitalize }}</td>
+                        <td>{% if d.result_label %}<span class="admin-pill {{ d.result_label }}">{{ d.result_label|upper }}</span>{% else %}—{% endif %}</td>
+                        <td>{{ d.confidence|default('—', true) }}{% if d.confidence %}%{% endif %}</td>
+                        <td><span class="admin-pill {{ d.status }}">{{ d.status }}</span></td>
+                        <td>{{ d.created_at.strftime('%d %b %Y') }}</td>
+                        <td><a href="{{ url_for('admin.detection_detail', det_id=d.id) }}" class="btn btn-sm btn-primary">View</a></td>
+                    </tr>{% endfor %}</tbody>
+                </table>
+                {% else %}<div class="empty-state"><p class="text-muted">No detections by this user.</p></div>{% endif %}
+            </div>
+        </div>
+        <div class="admin-card">
+            <div class="admin-card-header"><h3>Uploaded Videos</h3></div>
+            <div class="admin-card-body" style="padding:0;">
+                {% if videos %}
+                <table class="admin-table">
+                    <thead><tr><th>Title</th><th>Format</th><th>Size</th><th>Uploaded</th></tr></thead>
+                    <tbody>{% for v in videos %}<tr>
+                        <td><a href="{{ url_for('admin.video_detail', video_id=v.id) }}">{{ v.title }}</a></td>
+                        <td>{{ v.format|upper }}</td><td>{{ (v.file_size/1024/1024)|round(2) if v.file_size else '—' }} MB</td>
+                        <td>{{ v.created_at.strftime('%d %b %Y') }}</td>
+                    </tr>{% endfor %}</tbody>
+                </table>
+                {% else %}<div class="empty-state"><p class="text-muted">No videos uploaded.</p></div>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

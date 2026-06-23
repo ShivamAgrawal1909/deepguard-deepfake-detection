@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% block title %}Transformer Settings{% endblock %}
+{% block breadcrumb %}Transformer Model{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>Transformer Model Settings</h1><p>Configure the PyTorch transformer encoder architecture used for real/fake video classification.</p></div>
+<div class="admin-card settings-card"><div class="admin-card-body">
+    <div class="settings-info">The transformer encoder processes frame feature sequences using multi-head self-attention. Changes require retraining the model to take effect.</div>
+    <form method="POST">
+        <div class="admin-grid-2">
+            <div class="form-group"><label class="form-label">Encoder Layers</label><input type="number" name="layers" class="form-control" value="{{ settings.layers }}" min="1" max="12"></div>
+            <div class="form-group"><label class="form-label">Attention Heads</label><input type="number" name="heads" class="form-control" value="{{ settings.heads }}" min="1" max="16"></div>
+            <div class="form-group"><label class="form-label">Embedding Dimension</label><input type="number" name="embed_dim" class="form-control" value="{{ settings.embed_dim }}" min="32" max="512"></div>
+            <div class="form-group"><label class="form-label">Dropout Rate</label><input type="number" step="0.01" name="dropout" class="form-control" value="{{ settings.dropout }}"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Transformer Settings</button>
+    </form>
+</div></div>
+{% endblock %}

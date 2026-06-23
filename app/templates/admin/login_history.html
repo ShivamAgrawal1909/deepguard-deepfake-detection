@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+{% block title %}Login History{% endblock %}
+{% block breadcrumb %}Login History{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>Login History</h1><p>Track all user and admin login attempts with IP addresses and status.</p></div>
+<div class="admin-card"><div class="admin-card-body" style="padding:0;">
+    {% if items %}
+    <table class="admin-table">
+        <thead><tr><th>User</th><th>Role</th><th>Status</th><th>IP Address</th><th>Timestamp</th></tr></thead>
+        <tbody>{% for item in items %}<tr>
+            <td><strong>{{ item.username }}</strong></td>
+            <td><span class="admin-pill neutral">{{ item.role or '—' }}</span></td>
+            <td><span class="admin-pill {% if item.status=='success' %}success{% else %}danger{% endif %}">{{ item.status }}</span></td>
+            <td>{{ item.ip_address or '—' }}</td>
+            <td>{{ item.created_at.strftime('%d %b %Y, %H:%M:%S') }}</td>
+        </tr>{% endfor %}</tbody>
+    </table>
+    {% else %}<div class="empty-state"><p class="text-muted">No login records.</p></div>{% endif %}
+</div></div>
+{% endblock %}

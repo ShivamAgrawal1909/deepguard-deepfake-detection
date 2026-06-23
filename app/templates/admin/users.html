@@ -1,0 +1,64 @@
+{% extends "admin/base.html" %}
+{% block title %}Users{% endblock %}
+{% block breadcrumb %}Registered Users{% endblock %}
+{% block content %}
+<div class="admin-page-header">
+    <div class="header-row">
+        <div>
+            <h1>Manage Registered Users</h1>
+            <p>View user accounts, activate or deactivate access, and manage user lifecycle across the platform.</p>
+        </div>
+    </div>
+</div>
+
+<div class="admin-stats" style="grid-template-columns:repeat(3,1fr);max-width:720px;">
+    <div class="admin-stat-card" style="--stat-color:#6366f1;"><div class="stat-row"><span class="stat-label">Total Users</span></div><div class="stat-value">{{ user_stats.total }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#059669;"><div class="stat-row"><span class="stat-label">Active</span></div><div class="stat-value">{{ user_stats.active }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#dc2626;"><div class="stat-row"><span class="stat-label">Inactive</span></div><div class="stat-value">{{ user_stats.inactive }}</div></div>
+</div>
+
+<div class="admin-card">
+    <form method="GET" class="filter-bar">
+        <input name="search" class="form-control" placeholder="Search username or email..." value="{{ search }}" style="max-width:240px;">
+        <select name="status">
+            <option value="">All Statuses</option>
+            <option value="active" {% if status=='active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status=='inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+        <button type="submit" class="btn btn-primary btn-sm">Search</button>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-outline btn-sm">Clear</a>
+    </form>
+    <div class="admin-card-body" style="padding:0;">
+        {% if pagination.items %}
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>ID</th><th>Username</th><th>Full Name</th><th>Email</th><th>Phone</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+                <tbody>
+                    {% for user in pagination.items %}
+                    <tr>
+                        <td><strong>#{{ user.id }}</strong></td>
+                        <td><a href="{{ url_for('admin.user_detail', user_id=user.id) }}"><strong>{{ user.username }}</strong></a></td>
+                        <td>{{ user.full_name or '—' }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.phone or '—' }}</td>
+                        <td><span class="admin-pill {% if user.is_active_account %}success{% else %}danger{% endif %}">{{ 'Active' if user.is_active_account else 'Inactive' }}</span></td>
+                        <td>{{ user.created_at.strftime('%d %b %Y') }}</td>
+                        <td class="d-flex gap-1">
+                            <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" class="btn btn-sm btn-primary">View</a>
+                            <form method="POST" action="{{ url_for('admin.toggle_user', user_id=user.id) }}"><button class="btn btn-sm btn-warning">{{ 'Deactivate' if user.is_active_account else 'Activate' }}</button></form>
+                            <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}" onsubmit="return confirm('Permanently delete this user?')"><button class="btn btn-sm btn-danger">Delete</button></form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if pagination.pages > 1 %}
+        <div class="pagination" style="padding:1rem;">{% for p in pagination.iter_pages() %}{% if p %}<a href="?page={{ p }}&search={{ search }}&status={{ status }}" class="{{ 'active' if p==pagination.page }}">{{ p }}</a>{% endif %}{% endfor %}</div>
+        {% endif %}
+        {% else %}
+        <div class="empty-state"><div class="empty-icon">&#9787;</div><h4>No users found</h4><p>Try adjusting your search or filter criteria.</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

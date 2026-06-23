@@ -1,0 +1,74 @@
+{% extends "admin/base.html" %}
+{% block title %}Model Training{% endblock %}
+{% block breadcrumb %}Model Training{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>Detection Model Training &amp; Testing</h1><p>Train, update, and test the transformer-based deepfake detection model using the uploaded dataset.</p></div>
+
+<div class="admin-grid-2">
+    <div class="admin-card">
+        <div class="admin-card-header"><div><h3>Training Status</h3><span class="card-sub">Current model training state and metrics</span></div></div>
+        <div class="admin-card-body">
+            {% if training %}
+            <div class="detail-list">
+                <div class="detail-row"><span class="label">Status</span><span class="value"><span class="admin-pill {% if training.status=='completed' %}success{% elif training.status=='training' %}warning{% elif training.status=='failed' %}danger{% else %}neutral{% endif %}">{{ training.status|upper }}</span></span></div>
+                <div class="detail-row"><span class="label">Progress</span><span class="value">{{ training.current_epoch }} / {{ training.epochs }} epochs</span></div>
+                <div class="detail-row"><span class="label">Accuracy</span><span class="value"><strong>{{ training.accuracy|default('—', true) }}{% if training.accuracy %}%{% endif %}</strong></span></div>
+                <div class="detail-row"><span class="label">Loss</span><span class="value">{{ training.loss|default('—', true) }}</span></div>
+                <div class="detail-row"><span class="label">Started</span><span class="value">{{ training.started_at.strftime('%d %b %Y, %H:%M') if training.started_at else '—' }}</span></div>
+                <div class="detail-row"><span class="label">Completed</span><span class="value">{{ training.completed_at.strftime('%d %b %Y, %H:%M') if training.completed_at else '—' }}</span></div>
+                <div class="detail-row"><span class="label">Message</span><span class="value">{{ training.message or '—' }}</span></div>
+            </div>
+            {% if accuracy_chart %}
+            <div class="mt-2">
+                <p style="font-size:.78rem;font-weight:700;color:var(--admin-muted);text-transform:uppercase;margin-bottom:.5rem;">Accuracy Progress</p>
+                <div class="chart-bars">
+                    {% for acc in accuracy_chart %}
+                    <div class="chart-bar-col"><div class="chart-bar" style="height:{{ acc }}%;"></div><span>E{{ loop.index }}</span></div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="empty-state"><div class="empty-icon">&#129302;</div><h4>No training runs</h4><p>Upload dataset samples and start training.</p></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="admin-card mb-2">
+            <div class="admin-card-header"><h3>Train Model</h3></div>
+            <div class="admin-card-body">
+                <form method="POST" action="{{ url_for('admin.train_model') }}">
+                    <div class="form-group"><label class="form-label">Training Epochs</label><input type="number" name="epochs" class="form-control" value="10" min="1" max="100"></div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;" {% if training and training.status=='training' %}disabled{% endif %}>Start Model Training</button>
+                </form>
+            </div>
+        </div>
+        <div class="admin-card mb-2">
+            <div class="admin-card-header"><h3>Update Model</h3></div>
+            <div class="admin-card-body">
+                <p style="font-size:.82rem;color:var(--admin-muted);margin-bottom:.75rem;">Reload the detection model from disk after settings changes or new training.</p>
+                <form method="POST" action="{{ url_for('admin.update_model') }}"><button type="submit" class="btn btn-warning" style="width:100%;">Update Detection Model</button></form>
+            </div>
+        </div>
+        <div class="admin-card">
+            <div class="admin-card-header"><h3>Test Model</h3></div>
+            <div class="admin-card-body">
+                <form method="POST" action="{{ url_for('admin.test_model') }}" enctype="multipart/form-data">
+                    <div class="form-group"><label class="form-label">Test Video File</label><input type="file" name="test_file" class="form-control" accept="video/*" required></div>
+                    <button type="submit" class="btn btn-success" style="width:100%;">Run Test Detection</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if training and training.loss_history %}
+<div class="admin-card mt-3"><div class="admin-card-header"><h3>Training Metrics History</h3></div><div class="admin-card-body">
+    <div class="admin-grid-2">
+        <div><strong style="font-size:.82rem;">Loss History</strong><p style="font-size:.85rem;margin-top:.35rem;font-family:monospace;">{{ training.loss_history }}</p></div>
+        <div><strong style="font-size:.82rem;">Accuracy History</strong><p style="font-size:.85rem;margin-top:.35rem;font-family:monospace;">{{ training.accuracy_history }}</p></div>
+    </div>
+</div></div>
+{% endif %}
+{% endblock %}

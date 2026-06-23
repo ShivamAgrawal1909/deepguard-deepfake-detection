@@ -1,0 +1,74 @@
+{% extends "admin/base.html" %}
+{% block title %}Detection #{{ detection.id }}{% endblock %}
+{% block breadcrumb %}Detection Report{% endblock %}
+{% block content %}
+<div class="admin-page-header">
+    <div class="header-row">
+        <div><h1>Detection Report #{{ '%04d'|format(detection.id) }}</h1><p>Full analysis report with frame-level and frequency-domain inspection data.</p></div>
+        <div class="d-flex gap-1">
+            {% if detection.report_path %}<a href="{{ url_for('admin.download_report', det_id=detection.id) }}" class="btn btn-primary btn-sm">Download PDF</a>{% endif %}
+            <a href="{{ url_for('admin.detections') }}" class="btn btn-outline btn-sm">Back</a>
+        </div>
+    </div>
+</div>
+
+{% if detection.status == 'completed' %}
+<div class="result-hero-admin {{ detection.result_label }}">
+    <div style="font-size:2.5rem;">{% if detection.result_label == 'real' %}&#9989;{% else %}&#9888;{% endif %}</div>
+    <div>
+        <h2 style="font-size:1.5rem;font-weight:800;">{{ detection.result_label|upper }} — {% if detection.result_label == 'real' %}Authentic Media{% else %}Manipulation Detected{% endif %}</h2>
+        <p class="text-muted" style="font-size:.85rem;">User: {{ detection.user.username }} &middot; Type: {{ detection.request_type|capitalize }}</p>
+    </div>
+    <div style="text-align:right;">
+        <div style="font-size:.72rem;font-weight:700;color:var(--admin-muted);text-transform:uppercase;">Confidence</div>
+        <div style="font-size:2rem;font-weight:800;">{{ detection.confidence }}%</div>
+    </div>
+</div>
+{% elif detection.status == 'failed' %}
+<div class="alert alert-danger"><strong>Detection Failed:</strong> {{ detection.error_message }}</div>
+{% else %}
+<div class="alert alert-warning">Status: <strong>{{ detection.status|upper }}</strong></div>
+{% endif %}
+
+<div class="admin-grid-3">
+    <div class="admin-card"><div class="admin-card-header"><h3>Request Details</h3></div><div class="admin-card-body detail-list">
+        <div class="detail-row"><span class="label">Request ID</span><span class="value">#{{ detection.id }}</span></div>
+        <div class="detail-row"><span class="label">User</span><span class="value"><a href="{{ url_for('admin.user_detail', user_id=detection.user.id) }}">{{ detection.user.username }}</a></span></div>
+        <div class="detail-row"><span class="label">Type</span><span class="value">{{ detection.request_type|capitalize }}</span></div>
+        <div class="detail-row"><span class="label">Status</span><span class="value"><span class="admin-pill {{ detection.status }}">{{ detection.status }}</span></span></div>
+        <div class="detail-row"><span class="label">Submitted</span><span class="value">{{ detection.created_at.strftime('%d %b %Y, %H:%M:%S') }}</span></div>
+        <div class="detail-row"><span class="label">Completed</span><span class="value">{{ detection.completed_at.strftime('%d %b %Y, %H:%M:%S') if detection.completed_at else '—' }}</span></div>
+    </div></div>
+    <div class="admin-card"><div class="admin-card-header"><h3>Classification</h3></div><div class="admin-card-body detail-list">
+        <div class="detail-row"><span class="label">Result</span><span class="value">{% if detection.result_label %}<span class="admin-pill {{ detection.result_label }}">{{ detection.result_label|upper }}</span>{% else %}—{% endif %}</span></div>
+        <div class="detail-row"><span class="label">Confidence</span><span class="value">{{ detection.confidence|default('—', true) }}{% if detection.confidence %}%{% endif %}</span></div>
+        <div class="detail-row"><span class="label">Report</span><span class="value">{% if detection.report_path %}Available{% else %}Not generated{% endif %}</span></div>
+    </div></div>
+    <div class="admin-card"><div class="admin-card-header"><h3>Summary</h3></div><div class="admin-card-body"><p style="font-size:.85rem;line-height:1.7;">{{ detection.summary or 'No summary available.' }}</p></div></div>
+</div>
+
+{% if freq_data %}
+<div class="admin-grid-2 mt-3">
+    <div class="admin-card"><div class="admin-card-header"><h3>Frequency Pattern Analysis</h3></div><div class="admin-card-body detail-list">
+        <div class="detail-row"><span class="label">Pattern</span><span class="value">{{ freq_data.frequency_pattern }}</span></div>
+        <div class="detail-row"><span class="label">Avg Noise</span><span class="value">{{ freq_data.average_noise }}</span></div>
+        <div class="detail-row"><span class="label">Avg Texture</span><span class="value">{{ freq_data.average_texture }}</span></div>
+        <div class="detail-row"><span class="label">Anomaly Ratio</span><span class="value">{{ (freq_data.anomaly_ratio * 100)|round(1) }}%</span></div>
+        {% if freq_data.dominant_bands %}
+        <div class="freq-bars-admin">
+            {% for band in freq_data.dominant_bands %}{% set pct = (band * 100)|round(0)|int %}{% if pct > 100 %}{% set pct = 100 %}{% endif %}
+            <div class="freq-bar-row"><span class="bar-label">Band {{ loop.index }}</span><div class="bar-track"><div class="bar-fill" style="width:{{ pct }}%"></div></div><span class="bar-val">{{ band }}</span></div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div></div>
+    <div class="admin-card"><div class="admin-card-header"><h3>Frame Analysis Summary</h3></div><div class="admin-card-body">
+        {% if frame_data %}
+        <p style="font-size:.85rem;margin-bottom:.75rem;"><strong>{{ frame_data|length }}</strong> frames analyzed &middot; <strong>{{ frame_data|selectattr('anomaly_flag')|list|length }}</strong> anomalies detected</p>
+        <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Frame</th><th>Noise</th><th>Texture</th><th>Anomaly</th></tr></thead>
+        <tbody>{% for f in frame_data %}<tr><td>#{{ f.frame_index + 1 }}</td><td>{{ f.noise_score }}</td><td>{{ f.texture_score }}</td><td><span class="admin-pill {% if f.anomaly_flag %}fake{% else %}real{% endif %}">{% if f.anomaly_flag %}Yes{% else %}No{% endif %}</span></td></tr>{% endfor %}</tbody></table></div>
+        {% else %}<p class="text-muted">No frame data available.</p>{% endif %}
+    </div></div>
+</div>
+{% endif %}
+{% endblock %}

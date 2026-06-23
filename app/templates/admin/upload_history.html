@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% block title %}Upload History{% endblock %}
+{% block breadcrumb %}Upload History{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>Upload History</h1><p>Complete record of all video and image uploads across the platform.</p></div>
+<div class="admin-card"><div class="admin-card-body" style="padding:0;">
+    {% if items %}
+    <table class="admin-table">
+        <thead><tr><th>User ID</th><th>Filename</th><th>File Type</th><th>Size</th><th>Status</th><th>Timestamp</th></tr></thead>
+        <tbody>{% for item in items %}<tr>
+            <td><strong>#{{ item.user_id }}</strong></td>
+            <td>{{ item.filename }}</td>
+            <td><span class="admin-pill neutral">{{ item.file_type }}</span></td>
+            <td>{{ (item.file_size/1024)|round(1) if item.file_size else '—' }} KB</td>
+            <td><span class="admin-pill {% if item.status=='success' %}success{% else %}danger{% endif %}">{{ item.status }}</span></td>
+            <td>{{ item.created_at.strftime('%d %b %Y, %H:%M:%S') }}</td>
+        </tr>{% endfor %}</tbody>
+    </table>
+    {% else %}<div class="empty-state"><p class="text-muted">No upload records.</p></div>{% endif %}
+</div></div>
+{% endblock %}

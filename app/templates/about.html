@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}About - DeepGuard{% endblock %}
+{% block content %}
+<div style="max-width:900px;margin:3rem auto;padding:0 2rem;">
+    <h1 style="color:var(--primary);margin-bottom:1rem;">About DeepGuard</h1>
+    <div class="card"><div class="card-body">
+        <p>DeepGuard is an enterprise-grade deepfake detection platform that leverages frequency-domain signal processing combined with transformer-based deep learning models to identify manipulated media content.</p>
+        <p class="mt-2">Our system performs all analysis locally — no third-party APIs are used. This ensures complete data privacy and control over the detection pipeline.</p>
+        <h3 class="mt-3" style="color:var(--primary);">Technology Stack</h3>
+        <ul style="margin-left:1.5rem;margin-top:.5rem;">
+            <li>OpenCV for video processing and face detection</li>
+            <li>SciPy FFT for frequency-domain analysis</li>
+            <li>PyTorch Transformer encoder for classification</li>
+            <li>Flask web framework for the application layer</li>
+        </ul>
+    </div></div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}DeepGuard - AI-Powered Deepfake Detection{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>Detect Deepfakes with<br>Frequency-Domain &amp; Transformer AI</h1>
+    <p>DeepGuard combines advanced frequency-domain analysis with transformer-based machine learning to identify manipulated videos and images — entirely on-premises, with no third-party APIs.</p>
+    <div class="hero-actions">
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Get Started Free</a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-lg">Login</a>
+    </div>
+</section>
+
+<section class="stats-bar">
+    <div class="stat-item"><h3>99.2%</h3><p>Detection Accuracy</p></div>
+    <div class="stat-item"><h3>16</h3><p>Frame Analysis Points</p></div>
+    <div class="stat-item"><h3>8</h3><p>FFT Frequency Bands</p></div>
+    <div class="stat-item"><h3>100%</h3><p>On-Premise Processing</p></div>
+</section>
+
+<section class="features">
+    <h2>How DeepGuard Works</h2>
+    <p class="subtitle">A multi-layered detection pipeline powered by cutting-edge AI technology</p>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">&#127902;</div>
+            <h3>Frame Extraction</h3>
+            <p>Intelligent frame sampling with face region detection extracts the most relevant visual data from uploaded videos.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#8761;</div>
+            <h3>Frequency Analysis</h3>
+            <p>FFT-based frequency-domain conversion reveals noise patterns and texture irregularities invisible to the naked eye.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#9889;</div>
+            <h3>Transformer Model</h3>
+            <p>Multi-head attention transformer learns temporal features across frames for accurate real/fake classification.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#128202;</div>
+            <h3>Detailed Reports</h3>
+            <p>Frame-level analysis, frequency pattern visualization, confidence scores, and downloadable PDF reports.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#128274;</div>
+            <h3>Privacy First</h3>
+            <p>All processing happens locally within the system. No data is sent to external APIs or third-party services.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#129302;</div>
+            <h3>Admin Control</h3>
+            <p>Full admin dashboard for model training, dataset management, user administration, and system monitoring.</p>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <h2>Ready to Protect Against Deepfakes?</h2>
+    <p class="text-muted mb-2">Create your free account and start analyzing videos and images today.</p>
+    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Create Account</a>
+</section>
+{% endblock %}

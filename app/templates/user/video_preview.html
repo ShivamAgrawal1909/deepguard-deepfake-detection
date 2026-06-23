@@ -1,0 +1,64 @@
+{% extends "user/base.html" %}
+{% block title %}Video Preview{% endblock %}
+{% block breadcrumb %}Video Preview{% endblock %}
+{% block content %}
+<div class="user-page-header">
+    <div class="header-row">
+        <div>
+            <h1>{{ video.title }}</h1>
+            <p>Video validated successfully. Review details below and submit for deepfake detection analysis.</p>
+        </div>
+        <span class="status-pill completed">Validated</span>
+    </div>
+</div>
+
+<div class="video-preview-panel">
+    <div class="user-card">
+        <div class="user-card-header"><h3>Video Preview</h3></div>
+        <div class="user-card-body">
+            {% if video.thumbnail %}
+            <img src="{{ url_for('detection.serve_thumbnail', filename=video.thumbnail) }}" alt="{{ video.title }}" class="video-preview-thumb">
+            {% else %}
+            <div class="video-preview-thumb d-flex align-center justify-between" style="color:#fff;justify-content:center;font-size:3rem;">&#9654;</div>
+            {% endif %}
+            <form method="POST" action="{{ url_for('user.submit_detection', video_id=video.id) }}" class="mt-2">
+                <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">Submit for Deepfake Detection</button>
+            </form>
+            <p class="text-muted text-center mt-1" style="font-size:.78rem;">Analysis includes frame extraction, frequency-domain FFT, and transformer classification.</p>
+        </div>
+    </div>
+
+    <div>
+        <div class="user-card mb-2">
+            <div class="user-card-header"><h3>File Details</h3></div>
+            <div class="user-card-body video-meta-list">
+                <div class="detail-item"><span class="label">File ID</span><span class="value">#{{ '%04d'|format(video.id) }}</span></div>
+                <div class="detail-item"><span class="label">Original Name</span><span class="value">{{ video.original_filename or video.filename }}</span></div>
+                <div class="detail-item"><span class="label">Format</span><span class="value">{{ video.format|upper }}</span></div>
+                <div class="detail-item"><span class="label">File Size</span><span class="value">{{ (video.file_size / 1024 / 1024)|round(2) if video.file_size else '—' }} MB</span></div>
+                <div class="detail-item"><span class="label">Duration</span><span class="value">{{ video.duration|round(1) if video.duration else '—' }} seconds</span></div>
+                <div class="detail-item"><span class="label">Category</span><span class="value">{{ video.category.name if video.category else 'Uncategorized' }}</span></div>
+                <div class="detail-item"><span class="label">Uploaded</span><span class="value">{{ video.created_at.strftime('%d %b %Y, %H:%M') }}</span></div>
+                <div class="detail-item"><span class="label">Status</span><span class="value"><span class="status-pill completed">{{ video.status }}</span></span></div>
+            </div>
+        </div>
+
+        <div class="user-card">
+            <div class="user-card-header"><h3>Detection Pipeline</h3></div>
+            <div class="user-card-body">
+                <div class="pipeline-steps" style="flex-direction:column;">
+                    <div class="pipeline-step done"><div class="step-num">&#10003;</div><div class="step-label">Format Validation</div></div>
+                    <div class="pipeline-step"><div class="step-num">2</div><div class="step-label">Frame Extraction + Face Detection</div></div>
+                    <div class="pipeline-step"><div class="step-num">3</div><div class="step-label">Frequency-Domain Analysis</div></div>
+                    <div class="pipeline-step"><div class="step-num">4</div><div class="step-label">Transformer Classification</div></div>
+                    <div class="pipeline-step"><div class="step-num">5</div><div class="step-label">Report Generation</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-2">
+    <a href="{{ url_for('user.my_videos') }}" class="btn btn-outline">Back to My Videos</a>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% block title %}Monthly Report{% endblock %}
+{% block breadcrumb %}Monthly Report{% endblock %}
+{% block content %}
+<div class="admin-page-header">
+    <div class="header-row">
+        <div><h1>Monthly Activity Report</h1><p>Comprehensive platform metrics for {{ month }}.</p></div>
+        <a href="{{ url_for('admin.daily_report') }}" class="btn btn-outline btn-sm">Daily Report</a>
+    </div>
+</div>
+<div class="admin-stats">
+    <div class="admin-stat-card" style="--stat-color:#6366f1;"><div class="stat-label">Total Logins</div><div class="stat-value">{{ data.logins }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#8b5cf6;"><div class="stat-label">Total Uploads</div><div class="stat-value">{{ data.uploads }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#2563eb;"><div class="stat-label">Total Detections</div><div class="stat-value">{{ data.detections }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#059669;"><div class="stat-label">Real Results</div><div class="stat-value">{{ data.real }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#dc2626;"><div class="stat-label">Fake Results</div><div class="stat-value">{{ data.fake }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#0891b2;"><div class="stat-label">New Users</div><div class="stat-value">{{ data.users }}</div></div>
+</div>
+<div class="admin-grid-2">
+    <div class="admin-card"><div class="admin-card-header"><h3>Detection Breakdown</h3></div><div class="admin-card-body detail-list">
+        <div class="detail-row"><span class="label">Reporting Period</span><span class="value">{{ month }}</span></div>
+        <div class="detail-row"><span class="label">Total Detections</span><span class="value">{{ data.detections }}</span></div>
+        <div class="detail-row"><span class="label">Real Classifications</span><span class="value"><span class="admin-pill real">{{ data.real }}</span></span></div>
+        <div class="detail-row"><span class="label">Fake Classifications</span><span class="value"><span class="admin-pill fake">{{ data.fake }}</span></span></div>
+        <div class="detail-row"><span class="label">Fake Detection Rate</span><span class="value">{% if data.real + data.fake > 0 %}{{ ((data.fake / (data.real + data.fake)) * 100)|round(1) }}%{% else %}—{% endif %}</span></div>
+    </div></div>
+    <div class="admin-card"><div class="admin-card-header"><h3>Platform Growth</h3></div><div class="admin-card-body detail-list">
+        <div class="detail-row"><span class="label">New User Registrations</span><span class="value">{{ data.users }}</span></div>
+        <div class="detail-row"><span class="label">Total Uploads</span><span class="value">{{ data.uploads }}</span></div>
+        <div class="detail-row"><span class="label">Login Events</span><span class="value">{{ data.logins }}</span></div>
+    </div></div>
+</div>
+{% endblock %}

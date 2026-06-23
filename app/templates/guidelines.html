@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Upload Guidelines - DeepGuard{% endblock %}
+{% block content %}
+<div style="max-width:900px;margin:3rem auto;padding:0 2rem;">
+    <h1 style="color:var(--primary);margin-bottom:1rem;">Video Upload Guidelines</h1>
+    <div class="card"><div class="card-body">
+        <h3 style="color:var(--primary);">Supported Formats</h3>
+        <p>MP4, AVI, MOV, MKV, WEBM</p>
+        <h3 class="mt-3" style="color:var(--primary);">Requirements</h3>
+        <ul style="margin-left:1.5rem;margin-top:.5rem;">
+            <li>Maximum file size: 100 MB</li>
+            <li>Video must contain readable frames</li>
+            <li>Minimum resolution recommended: 480p</li>
+            <li>Faces should be visible for optimal detection</li>
+        </ul>
+        <h3 class="mt-3" style="color:var(--primary);">Image Detection</h3>
+        <p>Supported image formats: JPG, JPEG, PNG, BMP, WEBP</p>
+        <h3 class="mt-3" style="color:var(--primary);">Tips for Best Results</h3>
+        <ul style="margin-left:1.5rem;margin-top:.5rem;">
+            <li>Use well-lit videos with clear facial features</li>
+            <li>Avoid heavily compressed or low-quality footage</li>
+            <li>Shorter clips (under 2 minutes) process faster</li>
+            <li>Ensure the subject's face is clearly visible</li>
+        </ul>
+    </div></div>
+</div>
+{% endblock %}

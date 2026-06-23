@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block title %}Admin Profile{% endblock %}
+{% block breadcrumb %}Admin Profile{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>Manage Admin Profile</h1><p>Update your administrator account information and contact details.</p></div>
+<div class="profile-layout-admin">
+    <div class="admin-card"><div class="admin-card-body" style="text-align:center;padding:2rem;">
+        <div class="admin-avatar lg">{{ (current_user.full_name or current_user.username)[:2]|upper }}</div>
+        <h3 style="font-weight:700;">{{ current_user.full_name or current_user.username }}</h3>
+        <p class="text-muted">{{ current_user.email }}</p>
+        <span class="admin-pill info" style="margin-top:.5rem;">Administrator</span>
+        <div class="detail-list mt-2" style="text-align:left;">
+            <div class="detail-row"><span class="label">Username</span><span class="value">{{ current_user.username }}</span></div>
+            <div class="detail-row"><span class="label">Role</span><span class="value">System Admin</span></div>
+            <div class="detail-row"><span class="label">Member Since</span><span class="value">{{ current_user.created_at.strftime('%d %b %Y') }}</span></div>
+        </div>
+        <a href="{{ url_for('admin.change_password') }}" class="btn btn-outline btn-sm mt-2" style="width:100%;">Change Password</a>
+    </div></div>
+    <div class="admin-card"><div class="admin-card-header"><h3>Edit Profile</h3></div><div class="admin-card-body">
+        <form method="POST">
+            <div class="admin-grid-2">
+                <div class="form-group"><label class="form-label">Full Name</label><input name="full_name" class="form-control" value="{{ current_user.full_name or '' }}"></div>
+                <div class="form-group"><label class="form-label">Email</label><input name="email" type="email" class="form-control" value="{{ current_user.email }}"></div>
+                <div class="form-group"><label class="form-label">Phone</label><input name="phone" class="form-control" value="{{ current_user.phone or '' }}"></div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Save Changes</button>
+        </form>
+    </div></div>
+</div>
+{% endblock %}

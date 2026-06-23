@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ video.title }}{% endblock %}
+{% block breadcrumb %}Video Details{% endblock %}
+{% block content %}
+<div class="admin-page-header">
+    <div class="header-row">
+        <div><h1>{{ video.title }}</h1><p>Complete video metadata and upload information.</p></div>
+        <form method="POST" action="{{ url_for('admin.delete_video', video_id=video.id) }}" onsubmit="return confirm('Delete this video permanently?')"><button class="btn btn-danger btn-sm">Delete Video</button></form>
+    </div>
+</div>
+<div class="admin-grid-2">
+    <div class="admin-card"><div class="admin-card-header"><h3>File Information</h3></div><div class="admin-card-body detail-list">
+        <div class="detail-row"><span class="label">Video ID</span><span class="value">#{{ video.id }}</span></div>
+        <div class="detail-row"><span class="label">Original Filename</span><span class="value">{{ video.original_filename or video.filename }}</span></div>
+        <div class="detail-row"><span class="label">Stored Filename</span><span class="value">{{ video.filename }}</span></div>
+        <div class="detail-row"><span class="label">Format</span><span class="value">{{ video.format|upper }}</span></div>
+        <div class="detail-row"><span class="label">File Size</span><span class="value">{{ (video.file_size/1024/1024)|round(2) if video.file_size else '—' }} MB</span></div>
+        <div class="detail-row"><span class="label">Duration</span><span class="value">{{ video.duration|round(1) if video.duration else '—' }} seconds</span></div>
+        <div class="detail-row"><span class="label">Status</span><span class="value"><span class="admin-pill neutral">{{ video.status }}</span></span></div>
+    </div></div>
+    <div class="admin-card"><div class="admin-card-header"><h3>Upload Details</h3></div><div class="admin-card-body detail-list">
+        <div class="detail-row"><span class="label">Uploaded By</span><span class="value"><a href="{{ url_for('admin.user_detail', user_id=video.owner.id) }}">{{ video.owner.username }}</a></span></div>
+        <div class="detail-row"><span class="label">User Email</span><span class="value">{{ video.owner.email }}</span></div>
+        <div class="detail-row"><span class="label">Category</span><span class="value">{{ video.category.name if video.category else 'Uncategorized' }}</span></div>
+        <div class="detail-row"><span class="label">Upload Date</span><span class="value">{{ video.created_at.strftime('%d %b %Y, %H:%M:%S') }}</span></div>
+        <div class="detail-row"><span class="label">Detections</span><span class="value">{{ video.detections|length }} request(s)</span></div>
+    </div></div>
+</div>
+<a href="{{ url_for('admin.videos') }}" class="btn btn-outline mt-2">Back to Videos</a>
+{% endblock %}

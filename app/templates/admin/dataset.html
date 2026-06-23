@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% block title %}Dataset{% endblock %}
+{% block breadcrumb %}Detection Dataset{% endblock %}
+{% block content %}
+<div class="admin-page-header">
+    <div class="header-row">
+        <div><h1>Manage Deepfake Detection Dataset</h1><p>Upload and manage real and fake video samples used for transformer model training.</p></div>
+        <a href="{{ url_for('admin.upload_dataset') }}" class="btn btn-primary">+ Upload Samples</a>
+    </div>
+</div>
+<div class="d-flex gap-1 mb-2">
+    <a href="{{ url_for('admin.dataset', label='all') }}" class="btn btn-sm {{ 'btn-primary' if label=='all' else 'btn-outline' }}">All Records</a>
+    <a href="{{ url_for('admin.dataset', label='real') }}" class="btn btn-sm {{ 'btn-primary' if label=='real' else 'btn-outline' }}">Real Samples</a>
+    <a href="{{ url_for('admin.dataset', label='fake') }}" class="btn btn-sm {{ 'btn-primary' if label=='fake' else 'btn-outline' }}">Fake Samples</a>
+</div>
+<div class="admin-card"><div class="admin-card-body" style="padding:0;">
+    {% if records %}
+    <table class="admin-table">
+        <thead><tr><th>ID</th><th>Label</th><th>Original Filename</th><th>Stored As</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
+        <tbody>{% for r in records %}<tr>
+            <td><strong>#{{ r.id }}</strong></td>
+            <td><span class="admin-pill {{ r.label }}">{{ r.label|upper }}</span></td>
+            <td>{{ r.original_filename or r.filename }}</td>
+            <td class="text-muted">{{ r.filename }}</td>
+            <td>{{ (r.file_size/1024)|round(1) if r.file_size else '—' }} KB</td>
+            <td>{{ r.created_at.strftime('%d %b %Y') }}</td>
+            <td><form method="POST" action="{{ url_for('admin.delete_dataset', record_id=r.id) }}" onsubmit="return confirm('Delete record?')"><button class="btn btn-sm btn-danger">Delete</button></form></td>
+        </tr>{% endfor %}</tbody>
+    </table>
+    {% else %}<div class="empty-state"><div class="empty-icon">&#128193;</div><h4>No dataset records</h4><p>Upload real and fake samples to train the detection model.</p><a href="{{ url_for('admin.upload_dataset') }}" class="btn btn-primary">Upload Samples</a></div>{% endif %}
+</div></div>
+{% endblock %}

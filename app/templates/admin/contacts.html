@@ -1,0 +1,28 @@
+{% extends "admin/base.html" %}
+{% block title %}Contact Queries{% endblock %}
+{% block breadcrumb %}Contact Queries{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>Manage Contact Queries</h1><p>View contact messages, update reply status, and manage user inquiries.</p></div>
+<div class="admin-card"><div class="admin-card-body" style="padding:0;">
+    {% if items %}
+    <table class="admin-table">
+        <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Subject</th><th>Reply Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>{% for item in items %}
+        <tr>
+            <td><strong>#{{ item.id }}</strong></td><td>{{ item.name }}</td><td>{{ item.email }}</td><td><strong>{{ item.subject }}</strong></td>
+            <td><span class="admin-pill {% if item.reply_status=='replied' %}success{% else %}warning{% endif %}">{{ item.reply_status }}</span></td>
+            <td>{{ item.created_at.strftime('%d %b %Y') }}</td>
+            <td class="d-flex gap-1">
+                <form method="POST" action="{{ url_for('admin.contact_reply', item_id=item.id) }}">
+                    <select name="reply_status" class="form-control" style="width:auto;font-size:.8rem;"><option value="pending">Pending</option><option value="replied" selected>Replied</option></select>
+                    <button class="btn btn-sm btn-primary">Update</button>
+                </form>
+                <form method="POST" action="{{ url_for('admin.delete_contact', item_id=item.id) }}" onsubmit="return confirm('Delete?')"><button class="btn btn-sm btn-danger">Delete</button></form>
+            </td>
+        </tr>
+        <tr><td colspan="7" style="background:#f8fafc;font-size:.82rem;padding:.65rem 1rem;color:var(--admin-muted);"><strong>Message:</strong> {{ item.message }}</td></tr>
+        {% endfor %}</tbody>
+    </table>
+    {% else %}<div class="empty-state"><div class="empty-icon">&#9993;</div><h4>No contact messages</h4></div>{% endif %}
+</div></div>
+{% endblock %}

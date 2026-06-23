@@ -1,0 +1,73 @@
+{% extends "user/base.html" %}
+{% block title %}Feedback{% endblock %}
+{% block breadcrumb %}Feedback{% endblock %}
+{% block content %}
+<div class="user-page-header">
+    <h1>Feedback &amp; Suggestions</h1>
+    <p>Help us improve DeepGuard by sharing your experience, reporting issues, or requesting new features.</p>
+</div>
+
+<div class="user-grid-2">
+    <div class="user-card">
+        <div class="user-card-header">
+            <div><h3>Submit Feedback</h3><span class="card-subtitle">Your input helps us improve the platform</span></div>
+        </div>
+        <div class="user-card-body">
+            <form method="POST">
+                <div class="form-group">
+                    <label class="form-label">Subject</label>
+                    <input name="subject" class="form-control" placeholder="Brief summary of your feedback" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-control" disabled style="opacity:.7;">
+                        <option>General Feedback</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Message</label>
+                    <textarea name="message" class="form-control" rows="5" placeholder="Describe your feedback in detail..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Feedback</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="user-card">
+        <div class="user-card-header">
+            <div><h3>Your Feedback History</h3><span class="card-subtitle">Track status of submitted feedback</span></div>
+        </div>
+        <div class="user-card-body" style="padding:0;">
+            {% if items %}
+            <div class="user-table-wrap">
+                <table class="user-table">
+                    <thead>
+                        <tr><th>Subject</th><th>Status</th><th>Submitted</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>
+                                <strong>{{ item.subject }}</strong>
+                                <br><span class="text-muted" style="font-size:.78rem;">{{ item.message[:80] }}{% if item.message|length > 80 %}...{% endif %}</span>
+                            </td>
+                            <td>
+                                <span class="status-pill {% if item.status=='resolved' %}completed{% elif item.status=='reviewed' %}pending{% else %}pending{% endif %}">{{ item.status }}</span>
+                            </td>
+                            <td>{{ item.created_at.strftime('%d %b %Y') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">&#128172;</div>
+                <h4>No feedback submitted yet</h4>
+                <p>Share your thoughts using the form on the left.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

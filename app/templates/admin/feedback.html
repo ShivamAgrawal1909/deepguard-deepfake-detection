@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% block title %}Feedback{% endblock %}
+{% block breadcrumb %}User Feedback{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>Manage User Feedback</h1><p>Review user feedback submissions, update status, and remove resolved items.</p></div>
+<div class="admin-card"><div class="admin-card-body" style="padding:0;">
+    {% if items %}
+    <table class="admin-table">
+        <thead><tr><th>ID</th><th>User</th><th>Subject</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
+        <tbody>{% for item in items %}
+        <tr>
+            <td><strong>#{{ item.id }}</strong></td><td>{{ item.user.username }}</td><td><strong>{{ item.subject }}</strong></td>
+            <td><span class="admin-pill {% if item.status=='resolved' %}success{% else %}warning{% endif %}">{{ item.status }}</span></td>
+            <td>{{ item.created_at.strftime('%d %b %Y') }}</td>
+            <td class="d-flex gap-1">
+                <form method="POST" action="{{ url_for('admin.feedback_status', item_id=item.id) }}">
+                    <select name="status" class="form-control" style="width:auto;font-size:.8rem;">
+                        <option value="pending" {% if item.status=='pending' %}selected{% endif %}>Pending</option>
+                        <option value="reviewed" {% if item.status=='reviewed' %}selected{% endif %}>Reviewed</option>
+                        <option value="resolved" {% if item.status=='resolved' %}selected{% endif %}>Resolved</option>
+                    </select>
+                    <button class="btn btn-sm btn-primary">Update</button>
+                </form>
+                <form method="POST" action="{{ url_for('admin.delete_feedback', item_id=item.id) }}" onsubmit="return confirm('Delete?')"><button class="btn btn-sm btn-danger">Delete</button></form>
+            </td>
+        </tr>
+        <tr><td colspan="6" style="background:#f8fafc;font-size:.82rem;padding:.65rem 1rem;color:var(--admin-muted);"><strong>Message:</strong> {{ item.message }}</td></tr>
+        {% endfor %}</tbody>
+    </table>
+    {% else %}<div class="empty-state"><div class="empty-icon">&#128172;</div><h4>No feedback received</h4></div>{% endif %}
+</div></div>
+{% endblock %}

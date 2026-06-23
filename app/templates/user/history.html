@@ -1,0 +1,101 @@
+{% extends "user/base.html" %}
+{% block title %}Detection History{% endblock %}
+{% block breadcrumb %}Detection History{% endblock %}
+{% block content %}
+<div class="user-page-header">
+    <div class="header-row">
+        <div>
+            <h1>Detection History</h1>
+            <p>Search, filter, and manage all your past deepfake detection requests and analysis reports.</p>
+        </div>
+        <a href="{{ url_for('user.upload_video') }}" class="btn btn-primary">+ New Detection</a>
+    </div>
+</div>
+
+<div class="user-card">
+    <form method="GET" class="filter-bar">
+        <input name="search" class="form-control" placeholder="Search by result or status..." value="{{ search }}" style="max-width:220px;">
+        <select name="status">
+            <option value="">All Statuses</option>
+            <option value="completed" {% if status=='completed' %}selected{% endif %}>Completed</option>
+            <option value="pending" {% if status=='pending' %}selected{% endif %}>Pending</option>
+            <option value="failed" {% if status=='failed' %}selected{% endif %}>Failed</option>
+        </select>
+        <select name="result">
+            <option value="">All Results</option>
+            <option value="real" {% if result=='real' %}selected{% endif %}>Real</option>
+            <option value="fake" {% if result=='fake' %}selected{% endif %}>Fake</option>
+        </select>
+        <select name="type">
+            <option value="">All Types</option>
+            <option value="video" {% if req_type=='video' %}selected{% endif %}>Video</option>
+            <option value="image" {% if req_type=='image' %}selected{% endif %}>Image</option>
+        </select>
+        <button type="submit" class="btn btn-primary btn-sm">Apply Filters</button>
+        <a href="{{ url_for('user.history') }}" class="btn btn-outline btn-sm">Clear</a>
+    </form>
+
+    <div class="user-card-body" style="padding:0;">
+        {% if pagination.items %}
+        <div class="user-table-wrap">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Type</th>
+                        <th>Result</th>
+                        <th>Confidence</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th>Completed</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in pagination.items %}
+                    <tr>
+                        <td><strong>#{{ '%04d'|format(d.id) }}</strong></td>
+                        <td>{{ d.request_type|capitalize }}</td>
+                        <td>
+                            {% if d.result_label %}
+                            <span class="status-pill {{ d.result_label }}">{{ d.result_label|upper }}</span>
+                            {% else %}<span class="text-muted">—</span>{% endif %}
+                        </td>
+                        <td>{% if d.confidence %}<strong>{{ d.confidence }}%</strong>{% else %}—{% endif %}</td>
+                        <td><span class="status-pill {{ d.status }}">{{ d.status }}</span></td>
+                        <td>{{ d.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+                        <td>{{ d.completed_at.strftime('%d %b %Y, %H:%M') if d.completed_at else '—' }}</td>
+                        <td class="d-flex gap-1">
+                            <a href="{{ url_for('user.detection_result', det_id=d.id) }}" class="btn btn-sm btn-primary">View</a>
+                            {% if d.report_path %}
+                            <a href="{{ url_for('user.download_report', det_id=d.id) }}" class="btn btn-sm btn-outline">PDF</a>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('user.delete_history', det_id=d.id) }}" onsubmit="return confirm('Delete this detection record permanently?')">
+                                <button class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if pagination.pages > 1 %}
+        <div class="pagination" style="padding:1rem;">
+            {% for p in pagination.iter_pages() %}
+                {% if p %}
+                <a href="?page={{ p }}&search={{ search }}&status={{ status }}&result={{ result }}&type={{ req_type }}" class="{{ 'active' if p==pagination.page }}">{{ p }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">&#128203;</div>
+            <h4>No detection records found</h4>
+            <p>{% if search or status or result or req_type %}Try adjusting your filters or {% endif %}upload media to start your first analysis.</p>
+            <a href="{{ url_for('user.upload_video') }}" class="btn btn-primary">Upload Video</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

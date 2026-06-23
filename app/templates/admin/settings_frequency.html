@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+{% block title %}Frequency Settings{% endblock %}
+{% block breadcrumb %}Frequency Processing{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>Frequency-Domain Processing Settings</h1><p>Configure FFT band analysis, noise detection thresholds, and texture sensitivity parameters.</p></div>
+<div class="admin-card settings-card"><div class="admin-card-body">
+    <div class="settings-info">Frequency-domain analysis uses 2D FFT to detect spectral anomalies, noise patterns, and texture irregularities indicative of deepfake generation.</div>
+    <form method="POST">
+        <div class="form-group"><label class="form-label">FFT Frequency Bands</label><input type="number" name="fft_bands" class="form-control" value="{{ settings.fft_bands }}" min="4" max="32"></div>
+        <div class="form-group"><label class="form-label">Noise Threshold (0–1)</label><input type="number" step="0.01" name="noise_threshold" class="form-control" value="{{ settings.noise_threshold }}"></div>
+        <div class="form-group"><label class="form-label">Texture Sensitivity (0–1)</label><input type="number" step="0.01" name="texture_sensitivity" class="form-control" value="{{ settings.texture_sensitivity }}"></div>
+        <button type="submit" class="btn btn-primary">Save Frequency Settings</button>
+    </form>
+</div></div>
+{% endblock %}

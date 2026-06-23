@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+{% block title %}Upload Dataset{% endblock %}
+{% block breadcrumb %}Upload Dataset{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>Upload Dataset Samples</h1><p>Add real or fake video/image samples to the training dataset. Minimum 4 samples required for model training.</p></div>
+<div class="admin-grid-2">
+    <div class="admin-card"><div class="admin-card-header"><h3>Upload Files</h3></div><div class="admin-card-body">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label class="form-label">Sample Label</label>
+                <select name="label" class="form-control"><option value="real">Real (Authentic)</option><option value="fake">Fake (Manipulated)</option></select>
+            </div>
+            <div class="form-group"><label class="form-label">Video / Image Files</label><input type="file" name="files" class="form-control" multiple accept="video/*,image/*" required></div>
+            <button type="submit" class="btn btn-primary">Upload to Dataset</button>
+        </form>
+    </div></div>
+    <div class="admin-card"><div class="admin-card-header"><h3>Dataset Guidelines</h3></div><div class="admin-card-body">
+        <ul style="font-size:.84rem;color:var(--admin-muted);line-height:1.9;padding-left:1.25rem;">
+            <li>Upload balanced real and fake samples</li>
+            <li>Supported: MP4, AVI, MOV, MKV, WEBM, JPG, PNG</li>
+            <li>Ensure faces are visible in samples</li>
+            <li>Minimum 4 total samples to start training</li>
+            <li>More diverse samples improve model accuracy</li>
+        </ul>
+    </div></div>
+</div>
+{% endblock %}

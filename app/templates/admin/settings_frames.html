@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+{% block title %}Frame Settings{% endblock %}
+{% block breadcrumb %}Frame Extraction Settings{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>Frame Extraction Settings</h1><p>Configure how video frames are extracted and preprocessed before frequency-domain analysis.</p></div>
+<div class="admin-card settings-card"><div class="admin-card-body">
+    <div class="settings-info">These settings control frame sampling count, resize dimensions, and Haar cascade face detection used during the extraction pipeline.</div>
+    <form method="POST">
+        <div class="form-group"><label class="form-label">Frame Count</label><input type="number" name="frame_count" class="form-control" value="{{ settings.frame_count }}" min="4" max="64"><small class="text-muted">Number of frames sampled evenly from each video</small></div>
+        <div class="form-group"><label class="form-label">Frame Size (pixels)</label><input type="number" name="frame_size" class="form-control" value="{{ settings.frame_size }}" min="64" max="512"><small class="text-muted">Output resolution for each extracted frame</small></div>
+        <div class="form-group"><label><input type="checkbox" name="face_detection" {% if settings.face_detection %}checked{% endif %}> Enable Face Region Detection</label><br><small class="text-muted">Crop to detected face region for focused analysis</small></div>
+        <button type="submit" class="btn btn-primary">Save Frame Settings</button>
+    </form>
+</div></div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% block title %}Videos{% endblock %}
+{% block breadcrumb %}Uploaded Videos{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>Manage Uploaded Videos</h1><p>Review all user-uploaded videos, inspect metadata, and remove inappropriate content.</p></div>
+<div class="admin-card"><div class="admin-card-body" style="padding:0;">
+    {% if pagination.items %}
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead><tr><th>ID</th><th>Title</th><th>Uploaded By</th><th>Category</th><th>Format</th><th>Size</th><th>Duration</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody>{% for v in pagination.items %}<tr>
+                <td><strong>#{{ v.id }}</strong></td>
+                <td><a href="{{ url_for('admin.video_detail', video_id=v.id) }}"><strong>{{ v.title }}</strong></a></td>
+                <td><a href="{{ url_for('admin.user_detail', user_id=v.owner.id) }}">{{ v.owner.username }}</a></td>
+                <td>{{ v.category.name if v.category else '—' }}</td>
+                <td>{{ v.format|upper }}</td>
+                <td>{{ (v.file_size/1024/1024)|round(2) if v.file_size else '—' }} MB</td>
+                <td>{{ v.duration|round(1) if v.duration else '—' }}s</td>
+                <td><span class="admin-pill neutral">{{ v.status }}</span></td>
+                <td>{{ v.created_at.strftime('%d %b %Y') }}</td>
+                <td class="d-flex gap-1">
+                    <a href="{{ url_for('admin.video_detail', video_id=v.id) }}" class="btn btn-sm btn-primary">Details</a>
+                    <form method="POST" action="{{ url_for('admin.delete_video', video_id=v.id) }}" onsubmit="return confirm('Delete this video?')"><button class="btn btn-sm btn-danger">Delete</button></form>
+                </td>
+            </tr>{% endfor %}</tbody>
+        </table>
+    </div>
+    {% if pagination.pages > 1 %}<div class="pagination" style="padding:1rem;">{% for p in pagination.iter_pages() %}{% if p %}<a href="?page={{ p }}" class="{{ 'active' if p==pagination.page }}">{{ p }}</a>{% endif %}{% endfor %}</div>{% endif %}
+    {% else %}<div class="empty-state"><div class="empty-icon">&#9654;</div><h4>No videos uploaded</h4></div>{% endif %}
+</div></div>
+{% endblock %}

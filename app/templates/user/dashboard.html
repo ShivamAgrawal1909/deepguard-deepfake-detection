@@ -1,0 +1,185 @@
+{% extends "user/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
+{% block content %}
+<div class="user-page-header">
+    <div class="header-row">
+        <div>
+            <h1>Good day, {{ current_user.full_name or current_user.username }}</h1>
+            <p>Monitor your deepfake detection activity, review analysis results, and manage uploaded media from your secure portal.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('user.upload_video') }}" class="btn btn-primary">Upload Video</a>
+            <a href="{{ url_for('user.detect_image') }}" class="btn btn-outline">Analyze Image</a>
+        </div>
+    </div>
+</div>
+
+<div class="user-stats">
+    <div class="user-stat-card" style="--stat-accent:#3b82f6;">
+        <div class="stat-top">
+            <span class="stat-label">Videos Uploaded</span>
+            <div class="stat-icon-wrap">&#9654;</div>
+        </div>
+        <div class="stat-value">{{ stats.uploads }}</div>
+        <div class="stat-meta">Total media files in your library</div>
+    </div>
+    <div class="user-stat-card" style="--stat-accent:#6366f1;">
+        <div class="stat-top">
+            <span class="stat-label">Total Detections</span>
+            <div class="stat-icon-wrap">&#9881;</div>
+        </div>
+        <div class="stat-value">{{ stats.detections }}</div>
+        <div class="stat-meta">Video &amp; image analysis requests</div>
+    </div>
+    <div class="user-stat-card" style="--stat-accent:#059669;">
+        <div class="stat-top">
+            <span class="stat-label">Completed</span>
+            <div class="stat-icon-wrap">&#10003;</div>
+        </div>
+        <div class="stat-value">{{ stats.completed }}</div>
+        <div class="stat-meta">{{ stats.pending }} pending &middot; {{ stats.failed }} failed</div>
+    </div>
+    <div class="user-stat-card" style="--stat-accent:#059669;">
+        <div class="stat-top">
+            <span class="stat-label">Real Detected</span>
+            <div class="stat-icon-wrap">&#9989;</div>
+        </div>
+        <div class="stat-value">{{ stats.real }}</div>
+        <div class="stat-meta">Authentic media verified</div>
+    </div>
+    <div class="user-stat-card" style="--stat-accent:#dc2626;">
+        <div class="stat-top">
+            <span class="stat-label">Fake Detected</span>
+            <div class="stat-icon-wrap">&#9888;</div>
+        </div>
+        <div class="stat-value">{{ stats.fake }}</div>
+        <div class="stat-meta">Manipulated content flagged</div>
+    </div>
+    <div class="user-stat-card" style="--stat-accent:#7c3aed;">
+        <div class="stat-top">
+            <span class="stat-label">Account Status</span>
+            <div class="stat-icon-wrap">&#128274;</div>
+        </div>
+        <div class="stat-value" style="font-size:1.25rem;">Active</div>
+        <div class="stat-meta">Member since {{ current_user.created_at.strftime('%b %Y') }}</div>
+    </div>
+</div>
+
+<div class="user-quick-actions">
+    <a href="{{ url_for('user.upload_video') }}" class="user-action-card">
+        <div class="action-icon" style="background:#eff6ff;color:#3b82f6;">&#128228;</div>
+        <div>
+            <h4>Upload Video for Detection</h4>
+            <p>Submit MP4, AVI, MOV, MKV or WEBM files up to 100MB for full pipeline analysis.</p>
+        </div>
+    </a>
+    <a href="{{ url_for('user.detect_image') }}" class="user-action-card">
+        <div class="action-icon" style="background:#f5f3ff;color:#7c3aed;">&#128247;</div>
+        <div>
+            <h4>Image Frame Analysis</h4>
+            <p>Upload a single image frame for quick frequency-domain and transformer-based screening.</p>
+        </div>
+    </a>
+    <a href="{{ url_for('user.history') }}" class="user-action-card">
+        <div class="action-icon" style="background:#ecfdf5;color:#059669;">&#128203;</div>
+        <div>
+            <h4>View Detection History</h4>
+            <p>Search, filter, and download PDF reports from all your previous detection sessions.</p>
+        </div>
+    </a>
+</div>
+
+<div class="user-grid-3-1">
+    <div class="user-card">
+        <div class="user-card-header">
+            <div>
+                <h3>Recent Detection Activity</h3>
+                <span class="card-subtitle">Latest analysis requests and outcomes</span>
+            </div>
+            <a href="{{ url_for('user.history') }}" class="btn btn-sm btn-outline">View All</a>
+        </div>
+        <div class="user-card-body" style="padding:0;">
+            {% if recent %}
+            <div class="user-table-wrap">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Type</th>
+                            <th>Result</th>
+                            <th>Confidence</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in recent %}
+                        <tr>
+                            <td><strong>#{{ '%04d'|format(d.id) }}</strong></td>
+                            <td>{{ d.request_type|capitalize }}</td>
+                            <td>
+                                {% if d.result_label %}
+                                <span class="status-pill {{ d.result_label }}">{{ d.result_label|upper }}</span>
+                                {% else %}<span class="text-muted">—</span>{% endif %}
+                            </td>
+                            <td>{% if d.confidence %}<strong>{{ d.confidence }}%</strong>{% else %}—{% endif %}</td>
+                            <td><span class="status-pill {{ d.status }}">{{ d.status }}</span></td>
+                            <td>{{ d.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+                            <td><a href="{{ url_for('user.detection_result', det_id=d.id) }}" class="btn btn-sm btn-primary">Details</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">&#128269;</div>
+                <h4>No detections yet</h4>
+                <p>Upload your first video or image to start deepfake analysis.</p>
+                <a href="{{ url_for('user.upload_video') }}" class="btn btn-primary">Start Detection</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="user-card mb-2">
+            <div class="user-card-header"><h3>Detection Pipeline</h3></div>
+            <div class="user-card-body">
+                <div class="pipeline-steps">
+                    <div class="pipeline-step done"><div class="step-num">1</div><div class="step-label">Upload</div></div>
+                    <div class="pipeline-step done"><div class="step-num">2</div><div class="step-label">Frame Extract</div></div>
+                    <div class="pipeline-step done"><div class="step-num">3</div><div class="step-label">Frequency FFT</div></div>
+                    <div class="pipeline-step done"><div class="step-num">4</div><div class="step-label">Transformer</div></div>
+                    <div class="pipeline-step done"><div class="step-num">5</div><div class="step-label">Report</div></div>
+                </div>
+                <p class="text-muted" style="font-size:.8rem;line-height:1.5;">All processing runs locally on our servers using frequency-domain analysis and transformer models — no third-party APIs.</p>
+            </div>
+        </div>
+
+        <div class="user-card">
+            <div class="user-card-header"><h3>Recent Uploads</h3></div>
+            <div class="user-card-body">
+                {% if videos %}
+                <ul class="activity-list">
+                    {% for v in videos %}
+                    <li class="activity-item">
+                        <span class="activity-dot"></span>
+                        <div class="activity-content">
+                            <h5>{{ v.title }}</h5>
+                            <p>{{ v.format|upper }} &middot; {{ (v.file_size / 1024 / 1024)|round(2) if v.file_size else '—' }} MB &middot; {{ v.created_at.strftime('%d %b') }}</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <a href="{{ url_for('user.my_videos') }}" class="btn btn-sm btn-outline mt-2" style="width:100%;">Manage Videos</a>
+                {% else %}
+                <p class="text-muted" style="font-size:.85rem;">No videos uploaded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

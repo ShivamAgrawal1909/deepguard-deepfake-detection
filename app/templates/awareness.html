@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Deepfake Awareness - DeepGuard{% endblock %}
+{% block content %}
+<div style="max-width:900px;margin:3rem auto;padding:0 2rem;">
+    <h1 style="color:var(--primary);margin-bottom:1rem;">Deepfake Awareness</h1>
+    <div class="card"><div class="card-body">
+        <h3 style="color:var(--primary);">What are Deepfakes?</h3>
+        <p>Deepfakes are synthetic media created using artificial intelligence to replace a person's likeness with someone else's. They can be used to create convincing but fake videos and images.</p>
+        <h3 class="mt-3" style="color:var(--primary);">How to Identify Deepfakes</h3>
+        <ul style="margin-left:1.5rem;margin-top:.5rem;">
+            <li>Unnatural blinking patterns or lack of blinking</li>
+            <li>Inconsistent lighting on the face vs. background</li>
+            <li>Blurry or distorted edges around the face</li>
+            <li>Unusual skin texture or color inconsistencies</li>
+            <li>Audio-visual synchronization issues</li>
+            <li>Frequency-domain artifacts detectable by AI analysis</li>
+        </ul>
+        <h3 class="mt-3" style="color:var(--primary);">Why Use DeepGuard?</h3>
+        <p>Our system goes beyond visual inspection by analyzing the frequency patterns and temporal features that deepfake generation algorithms leave behind, providing scientific evidence of manipulation.</p>
+    </div></div>
+</div>
+{% endblock %}

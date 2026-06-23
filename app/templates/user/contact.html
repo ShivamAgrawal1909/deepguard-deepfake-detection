@@ -1,0 +1,63 @@
+{% extends "user/base.html" %}
+{% block title %}Contact Support{% endblock %}
+{% block breadcrumb %}Contact Support{% endblock %}
+{% block content %}
+<div class="user-page-header">
+    <h1>Contact Support</h1>
+    <p>Reach our support team for technical assistance, account inquiries, or general questions about the detection platform.</p>
+</div>
+
+<div class="user-grid-2">
+    <div class="user-card">
+        <div class="user-card-header">
+            <div><h3>Send a Message</h3><span class="card-subtitle">We typically respond within 24–48 hours</span></div>
+        </div>
+        <div class="user-card-body">
+            <form method="POST">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input name="name" class="form-control" value="{{ current_user.full_name or current_user.username }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input name="email" type="email" class="form-control" value="{{ current_user.email }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subject</label>
+                    <input name="subject" class="form-control" placeholder="What can we help you with?" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Message</label>
+                    <textarea name="message" class="form-control" rows="6" placeholder="Provide as much detail as possible..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <div class="user-card mb-2">
+            <div class="user-card-header"><h3>Support Information</h3></div>
+            <div class="user-card-body">
+                <div class="detail-item"><span class="label">Platform</span><span class="value">DeepGuard v1.0</span></div>
+                <div class="detail-item"><span class="label">Response Time</span><span class="value">24–48 hours</span></div>
+                <div class="detail-item"><span class="label">Your Account</span><span class="value">{{ current_user.username }}</span></div>
+                <div class="detail-item"><span class="label">Member Since</span><span class="value">{{ current_user.created_at.strftime('%d %b %Y') }}</span></div>
+            </div>
+        </div>
+        <div class="user-card">
+            <div class="user-card-header"><h3>Common Topics</h3></div>
+            <div class="user-card-body">
+                <ul style="font-size:.875rem;line-height:2;padding-left:1.25rem;color:var(--user-muted);">
+                    <li>Video upload and format issues</li>
+                    <li>Detection result interpretation</li>
+                    <li>Account and password help</li>
+                    <li>Report download problems</li>
+                    <li>Feature requests and feedback</li>
+                </ul>
+                <a href="{{ url_for('main.guidelines') }}" class="btn btn-outline btn-sm mt-1" target="_blank">View Upload Guidelines</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

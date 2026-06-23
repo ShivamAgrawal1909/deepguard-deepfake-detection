@@ -1,0 +1,59 @@
+{% extends "user/base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block breadcrumb %}My Profile{% endblock %}
+{% block content %}
+<div class="user-page-header">
+    <h1>My Profile</h1>
+    <p>Manage your personal information and account details.</p>
+</div>
+
+<div class="profile-layout">
+    <div class="user-card profile-sidebar-card">
+        <div class="user-avatar-lg">{{ (current_user.full_name or current_user.username)[:2]|upper }}</div>
+        <h3>{{ current_user.full_name or current_user.username }}</h3>
+        <p class="text-muted" style="font-size:.85rem;">{{ current_user.email }}</p>
+        <span class="role-badge">Verified User</span>
+        <div style="margin-top:1.5rem;text-align:left;">
+            <div class="detail-item"><span class="label">Username</span><span class="value">{{ current_user.username }}</span></div>
+            <div class="detail-item"><span class="label">Phone</span><span class="value">{{ current_user.phone or 'Not set' }}</span></div>
+            <div class="detail-item"><span class="label">Member Since</span><span class="value">{{ current_user.created_at.strftime('%d %b %Y') }}</span></div>
+            <div class="detail-item"><span class="label">Last Updated</span><span class="value">{{ current_user.updated_at.strftime('%d %b %Y') if current_user.updated_at else '—' }}</span></div>
+            <div class="detail-item"><span class="label">Account Status</span><span class="value"><span class="status-pill completed">Active</span></span></div>
+        </div>
+        <a href="{{ url_for('user.change_password') }}" class="btn btn-outline btn-sm mt-2" style="width:100%;">Change Password</a>
+    </div>
+
+    <div class="user-card">
+        <div class="user-card-header">
+            <div><h3>Edit Profile Information</h3><span class="card-subtitle">Update your contact and display details</span></div>
+        </div>
+        <div class="user-card-body">
+            <form method="POST">
+                <div class="user-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input class="form-control" value="{{ current_user.username }}" disabled>
+                        <small class="text-muted">Username cannot be changed</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input name="full_name" class="form-control" value="{{ current_user.full_name or '' }}" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input name="email" type="email" class="form-control" value="{{ current_user.email }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input name="phone" class="form-control" value="{{ current_user.phone or '' }}" placeholder="+1 234 567 8900">
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mt-2">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

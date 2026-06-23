@@ -1,0 +1,187 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
+{% block content %}
+<div class="admin-page-header">
+    <div class="header-row">
+        <div>
+            <h1>System Dashboard</h1>
+            <p>Real-time overview of platform activity, detection operations, user management, and ML pipeline status.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.daily_report') }}" class="btn btn-outline btn-sm">Daily Report</a>
+            <a href="{{ url_for('admin.model_status') }}" class="btn btn-primary btn-sm">Model Training</a>
+        </div>
+    </div>
+</div>
+
+<div class="admin-stats">
+    <div class="admin-stat-card" style="--stat-color:#6366f1;--stat-bg:#eef2ff;">
+        <div class="stat-row"><span class="stat-label">Registered Users</span><div class="stat-icon">&#9787;</div></div>
+        <div class="stat-value">{{ stats.users }}</div>
+        <div class="stat-meta">{{ stats.active_users }} active &middot; {{ stats.users - stats.active_users }} inactive</div>
+    </div>
+    <div class="admin-stat-card" style="--stat-color:#8b5cf6;--stat-bg:#f5f3ff;">
+        <div class="stat-row"><span class="stat-label">Uploaded Videos</span><div class="stat-icon">&#9654;</div></div>
+        <div class="stat-value">{{ stats.videos }}</div>
+        <div class="stat-meta">{{ stats.categories }} categories configured</div>
+    </div>
+    <div class="admin-stat-card" style="--stat-color:#2563eb;--stat-bg:#eff6ff;">
+        <div class="stat-row"><span class="stat-label">Total Detections</span><div class="stat-icon">&#9881;</div></div>
+        <div class="stat-value">{{ stats.detections }}</div>
+        <div class="stat-meta">{{ stats.completed }} completed &middot; {{ stats.pending }} pending</div>
+    </div>
+    <div class="admin-stat-card" style="--stat-color:#059669;--stat-bg:#ecfdf5;">
+        <div class="stat-row"><span class="stat-label">Real Results</span><div class="stat-icon">&#9989;</div></div>
+        <div class="stat-value">{{ stats.real }}</div>
+        <div class="stat-meta">Authentic media verified</div>
+    </div>
+    <div class="admin-stat-card" style="--stat-color:#dc2626;--stat-bg:#fef2f2;">
+        <div class="stat-row"><span class="stat-label">Fake Detected</span><div class="stat-icon">&#9888;</div></div>
+        <div class="stat-value">{{ stats.fake }}</div>
+        <div class="stat-meta">{{ stats.failed }} failed analyses</div>
+    </div>
+    <div class="admin-stat-card" style="--stat-color:#d97706;--stat-bg:#fffbeb;">
+        <div class="stat-row"><span class="stat-label">Pending Items</span><div class="stat-icon">&#9203;</div></div>
+        <div class="stat-value">{{ stats.pending + stats.feedback + stats.contacts }}</div>
+        <div class="stat-meta">{{ stats.feedback }} feedback &middot; {{ stats.contacts }} contacts</div>
+    </div>
+    <div class="admin-stat-card" style="--stat-color:#0891b2;--stat-bg:#ecfeff;">
+        <div class="stat-row"><span class="stat-label">Dataset Samples</span><div class="stat-icon">&#128193;</div></div>
+        <div class="stat-value">{{ stats.dataset }}</div>
+        <div class="stat-meta">Training dataset records</div>
+    </div>
+</div>
+
+<div class="quick-links">
+    <a href="{{ url_for('admin.users') }}" class="quick-link">
+        <div class="ql-icon" style="background:#eef2ff;color:#6366f1;">&#9787;</div>
+        <span>Manage Users</span>
+    </a>
+    <a href="{{ url_for('admin.detections', status='pending') }}" class="quick-link">
+        <div class="ql-icon" style="background:#fffbeb;color:#d97706;">&#9203;</div>
+        <span>Pending Detections</span>
+    </a>
+    <a href="{{ url_for('admin.dataset') }}" class="quick-link">
+        <div class="ql-icon" style="background:#ecfeff;color:#0891b2;">&#128193;</div>
+        <span>Manage Dataset</span>
+    </a>
+    <a href="{{ url_for('admin.feedback_list') }}" class="quick-link">
+        <div class="ql-icon" style="background:#f5f3ff;color:#8b5cf6;">&#128172;</div>
+        <span>Review Feedback</span>
+    </a>
+    <a href="{{ url_for('admin.logs') }}" class="quick-link">
+        <div class="ql-icon" style="background:#f1f5f9;color:#475569;">&#128220;</div>
+        <span>System Logs</span>
+    </a>
+</div>
+
+<div class="admin-grid-3-1">
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <div><h3>Recent Detection Requests</h3><span class="card-sub">Latest analysis activity across all users</span></div>
+            <a href="{{ url_for('admin.detections') }}" class="btn btn-sm btn-outline">View All</a>
+        </div>
+        <div class="admin-card-body" style="padding:0;">
+            {% if recent_detections %}
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead><tr><th>ID</th><th>User</th><th>Type</th><th>Result</th><th>Confidence</th><th>Status</th><th>Date</th><th></th></tr></thead>
+                    <tbody>
+                        {% for d in recent_detections %}
+                        <tr>
+                            <td><strong>#{{ '%04d'|format(d.id) }}</strong></td>
+                            <td>{{ d.user.username }}</td>
+                            <td>{{ d.request_type|capitalize }}</td>
+                            <td>{% if d.result_label %}<span class="admin-pill {{ d.result_label }}">{{ d.result_label|upper }}</span>{% else %}—{% endif %}</td>
+                            <td>{% if d.confidence %}<strong>{{ d.confidence }}%</strong>{% else %}—{% endif %}</td>
+                            <td><span class="admin-pill {{ d.status }}">{{ d.status }}</span></td>
+                            <td>{{ d.created_at.strftime('%d %b, %H:%M') }}</td>
+                            <td><a href="{{ url_for('admin.detection_detail', det_id=d.id) }}" class="btn btn-sm btn-primary">View</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state"><div class="empty-icon">&#9881;</div><h4>No detections yet</h4><p>Detection requests will appear here.</p></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="admin-card mb-2">
+            <div class="admin-card-header"><h3>System Health</h3></div>
+            <div class="admin-card-body">
+                <div class="system-health">
+                    <div class="health-item"><span><span class="health-dot"></span>Detection Engine</span><span class="admin-pill success">Online</span></div>
+                    <div class="health-item"><span><span class="health-dot"></span>Database</span><span class="admin-pill success">Connected</span></div>
+                    <div class="health-item"><span><span class="health-dot"></span>ML Model</span>
+                        <span class="admin-pill {% if training and training.status=='completed' %}success{% elif training and training.status=='training' %}warning{% else %}neutral{% endif %}">
+                            {{ training.status|upper if training else 'IDLE' }}
+                        </span>
+                    </div>
+                    <div class="health-item"><span><span class="health-dot"></span>Processing</span><span class="admin-pill info">Local Only</span></div>
+                </div>
+                {% if training %}
+                <div class="detail-list mt-2">
+                    <div class="detail-row"><span class="label">Model Accuracy</span><span class="value">{{ training.accuracy|default('—', true) }}%</span></div>
+                    <div class="detail-row"><span class="label">Model Loss</span><span class="value">{{ training.loss|default('—', true) }}</span></div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="admin-card-header"><h3>Recent Users</h3></div>
+            <div class="admin-card-body" style="padding:0;">
+                {% if recent_users %}
+                <table class="admin-table">
+                    <thead><tr><th>User</th><th>Status</th><th>Joined</th></tr></thead>
+                    <tbody>
+                        {% for u in recent_users %}
+                        <tr>
+                            <td><a href="{{ url_for('admin.user_detail', user_id=u.id) }}"><strong>{{ u.username }}</strong></a></td>
+                            <td><span class="admin-pill {% if u.is_active_account %}success{% else %}danger{% endif %}">{{ 'Active' if u.is_active_account else 'Inactive' }}</span></td>
+                            <td>{{ u.created_at.strftime('%d %b') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state"><p class="text-muted">No users registered.</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="admin-card mt-3">
+    <div class="admin-card-header">
+        <div><h3>System Activity Log</h3><span class="card-sub">Latest administrative and system events</span></div>
+        <a href="{{ url_for('admin.logs') }}" class="btn btn-sm btn-outline">Full Logs</a>
+    </div>
+    <div class="admin-card-body" style="padding:0;">
+        {% if recent_logs %}
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>Type</th><th>Action</th><th>Details</th><th>IP</th><th>Timestamp</th></tr></thead>
+                <tbody>
+                    {% for log in recent_logs %}
+                    <tr>
+                        <td><span class="admin-pill neutral">{{ log.log_type }}</span></td>
+                        <td><strong>{{ log.action }}</strong></td>
+                        <td class="text-muted">{{ log.details or '—' }}</td>
+                        <td>{{ log.ip_address or '—' }}</td>
+                        <td>{{ log.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><p class="text-muted">No system logs recorded.</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

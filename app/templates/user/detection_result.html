@@ -1,0 +1,180 @@
+{% extends "user/base.html" %}
+{% block title %}Detection Result #{{ detection.id }}{% endblock %}
+{% block breadcrumb %}Detection Result{% endblock %}
+{% block content %}
+<div class="user-page-header">
+    <div class="header-row">
+        <div>
+            <h1>Detection Report #{{ '%04d'|format(detection.id) }}</h1>
+            <p>Complete analysis results including frame-level inspection, frequency patterns, and classification confidence.</p>
+        </div>
+        <div class="d-flex gap-1">
+            {% if detection.report_path %}
+            <a href="{{ url_for('user.download_report', det_id=detection.id) }}" class="btn btn-primary">Download PDF Report</a>
+            {% endif %}
+            <a href="{{ url_for('user.history') }}" class="btn btn-outline">Back to History</a>
+        </div>
+    </div>
+</div>
+
+{% if detection.status == 'completed' %}
+<div class="result-hero {{ detection.result_label }}">
+    <div class="result-hero-icon">{% if detection.result_label == 'real' %}&#9989;{% else %}&#9888;{% endif %}</div>
+    <div>
+        <h2>{% if detection.result_label == 'real' %}Authentic Media Detected{% else %}Deepfake / Manipulation Detected{% endif %}</h2>
+        <p class="result-sub">Classification: <strong>{{ detection.result_label|upper }}</strong> &middot; Request Type: {{ detection.request_type|capitalize }} &middot; Processed {{ detection.completed_at.strftime('%d %b %Y at %H:%M') if detection.completed_at else '—' }}</p>
+    </div>
+    <div class="confidence-meter">
+        <label>Confidence Score</label>
+        <div class="meter-value">{{ detection.confidence }}%</div>
+        <div class="meter-bar"><div class="meter-fill {{ detection.result_label }}" style="width:{{ detection.confidence }}%"></div></div>
+    </div>
+</div>
+{% elif detection.status == 'failed' %}
+<div class="result-hero failed">
+    <div class="result-hero-icon">&#10007;</div>
+    <div>
+        <h2>Detection Failed</h2>
+        <p class="result-sub">{{ detection.error_message }}</p>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning">Processing in progress. Status: <strong>{{ detection.status|upper }}</strong></div>
+{% endif %}
+
+<div class="detail-grid">
+    <div class="user-card">
+        <div class="user-card-header"><h3>Request Information</h3></div>
+        <div class="user-card-body">
+            <div class="detail-item"><span class="label">Request ID</span><span class="value">#{{ '%04d'|format(detection.id) }}</span></div>
+            <div class="detail-item"><span class="label">Analysis Type</span><span class="value">{{ detection.request_type|capitalize }}</span></div>
+            <div class="detail-item"><span class="label">Status</span><span class="value"><span class="status-pill {{ detection.status }}">{{ detection.status }}</span></span></div>
+            <div class="detail-item"><span class="label">Submitted</span><span class="value">{{ detection.created_at.strftime('%d %b %Y, %H:%M:%S') }}</span></div>
+            <div class="detail-item"><span class="label">Completed</span><span class="value">{{ detection.completed_at.strftime('%d %b %Y, %H:%M:%S') if detection.completed_at else '—' }}</span></div>
+            {% if video %}
+            <div class="detail-item"><span class="label">Video Title</span><span class="value">{{ video.title }}</span></div>
+            <div class="detail-item"><span class="label">Video Format</span><span class="value">{{ video.format|upper }}</span></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="user-card">
+        <div class="user-card-header"><h3>Processing Pipeline</h3></div>
+        <div class="user-card-body">
+            <div class="pipeline-steps">
+                <div class="pipeline-step {% if detection.status != 'failed' %}done{% endif %}"><div class="step-num">1</div><div class="step-label">Upload</div></div>
+                <div class="pipeline-step {% if detection.status == 'completed' %}done{% endif %}"><div class="step-num">2</div><div class="step-label">Frames</div></div>
+                <div class="pipeline-step {% if detection.status == 'completed' %}done{% endif %}"><div class="step-num">3</div><div class="step-label">FFT</div></div>
+                <div class="pipeline-step {% if detection.status == 'completed' %}done{% endif %}"><div class="step-num">4</div><div class="step-label">Transformer</div></div>
+                <div class="pipeline-step {% if detection.status == 'completed' %}done{% endif %}"><div class="step-num">5</div><div class="step-label">Report</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="user-card">
+        <div class="user-card-header"><h3>Classification Summary</h3></div>
+        <div class="user-card-body">
+            <p style="font-size:.9rem;line-height:1.7;">{{ detection.summary or 'No summary available for this request.' }}</p>
+        </div>
+    </div>
+</div>
+
+{% if freq_data %}
+<div class="user-grid-2">
+    <div class="user-card">
+        <div class="user-card-header">
+            <div><h3>Frequency Pattern Analysis</h3><span class="card-subtitle">FFT-based spectral analysis results</span></div>
+        </div>
+        <div class="user-card-body">
+            <div class="detail-item"><span class="label">Pattern Classification</span><span class="value" style="max-width:55%;">{{ freq_data.frequency_pattern }}</span></div>
+            <div class="detail-item"><span class="label">Average Noise Score</span><span class="value">{{ freq_data.average_noise }}</span></div>
+            <div class="detail-item"><span class="label">Average Texture Score</span><span class="value">{{ freq_data.average_texture }}</span></div>
+            <div class="detail-item"><span class="label">Anomaly Frame Ratio</span><span class="value">{{ (freq_data.anomaly_ratio * 100)|round(1) }}%</span></div>
+
+            {% if freq_data.dominant_bands %}
+            <div class="freq-bars">
+                <p style="font-size:.78rem;font-weight:700;color:var(--user-muted);text-transform:uppercase;margin-bottom:.75rem;">Dominant Frequency Bands</p>
+                {% for band in freq_data.dominant_bands %}
+                {% set pct = (band * 100)|round(0)|int %}
+                {% if pct > 100 %}{% set pct = 100 %}{% endif %}
+                <div class="freq-bar-row">
+                    <span class="bar-label">Band {{ loop.index }}</span>
+                    <div class="bar-track"><div class="bar-fill" style="width:{{ pct }}%"></div></div>
+                    <span class="bar-value">{{ band }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="user-card">
+        <div class="user-card-header"><h3>Analysis Interpretation</h3></div>
+        <div class="user-card-body">
+            <div style="font-size:.875rem;line-height:1.7;color:var(--user-muted);">
+                {% if detection.result_label == 'fake' %}
+                <p><strong style="color:#dc2626;">Manipulation Indicators Found:</strong> Elevated high-frequency artifacts and texture irregularities were detected across analyzed frames, consistent with synthetic media generation patterns.</p>
+                {% elif detection.result_label == 'real' %}
+                <p><strong style="color:#059669;">Authentic Media Profile:</strong> Frequency distribution and noise patterns align with naturally captured video, showing no significant manipulation artifacts.</p>
+                {% else %}
+                <p>Analysis interpretation will be available once detection completes.</p>
+                {% endif %}
+                <p class="mt-2">Noise scores above 0.35 or texture scores above 0.50 may indicate compression artifacts or manipulation. The transformer model combines these features with temporal frame patterns for final classification.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if frame_data %}
+<div class="user-card mt-3">
+    <div class="user-card-header">
+        <div>
+            <h3>Frame-Level Analysis</h3>
+            <span class="card-subtitle">{{ frame_data|length }} frames analyzed &middot; {{ frame_data|selectattr('anomaly_flag')|list|length }} anomalies detected</span>
+        </div>
+    </div>
+    <div class="user-card-body">
+        <div class="frame-grid mb-2">
+            {% for f in frame_data %}
+            <div class="frame-card {% if f.anomaly_flag %}anomaly{% endif %}">
+                <div class="frame-num">Frame {{ f.frame_index + 1 }}</div>
+                <div class="frame-scores">
+                    Noise: <strong>{{ f.noise_score }}</strong><br>
+                    Texture: <strong>{{ f.texture_score }}</strong>
+                </div>
+                <span class="status-pill {% if f.anomaly_flag %}fake{% else %}real{% endif %}" style="margin-top:.5rem;font-size:.65rem;">
+                    {% if f.anomaly_flag %}Anomaly{% else %}Normal{% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="user-table-wrap">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Frame #</th>
+                        <th>Noise Score</th>
+                        <th>Texture Score</th>
+                        <th>Band Energy (Top 3)</th>
+                        <th>Anomaly Flag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in frame_data %}
+                    <tr>
+                        <td><strong>{{ f.frame_index + 1 }}</strong></td>
+                        <td>{{ f.noise_score }}</td>
+                        <td>{{ f.texture_score }}</td>
+                        <td>{{ f.band_energy[:3] if f.band_energy else '—' }}</td>
+                        <td><span class="status-pill {% if f.anomaly_flag %}fake{% else %}real{% endif %}">{% if f.anomaly_flag %}Yes{% else %}No{% endif %}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

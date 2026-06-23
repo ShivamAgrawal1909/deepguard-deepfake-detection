@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin{% endblock %} | DeepGuard Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="admin-layout">
+<div class="dashboard-layout">
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="admin-sidebar-brand">
+            <a href="{{ url_for('admin.dashboard') }}">Deep<span>Guard</span></a>
+            <div class="admin-badge">Admin Console</div>
+        </div>
+
+        <div class="admin-profile-card">
+            <div class="admin-avatar">{{ (current_user.full_name or current_user.username)[:2]|upper }}</div>
+            <div>
+                <h4>{{ current_user.full_name or current_user.username }}</h4>
+                <p>System Administrator</p>
+            </div>
+        </div>
+
+        <nav class="admin-nav">
+            <div class="admin-nav-section">Overview</div>
+            <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                <span class="nav-icon">&#9632;</span> Dashboard
+            </a>
+
+            <div class="admin-nav-section">Account</div>
+            <a href="{{ url_for('admin.profile') }}" class="admin-nav-link {% if request.endpoint == 'admin.profile' %}active{% endif %}">
+                <span class="nav-icon">&#9679;</span> Admin Profile
+            </a>
+            <a href="{{ url_for('admin.change_password') }}" class="admin-nav-link {% if request.endpoint == 'admin.change_password' %}active{% endif %}">
+                <span class="nav-icon">&#9919;</span> Change Password
+            </a>
+
+            <div class="admin-nav-section">User Management</div>
+            <a href="{{ url_for('admin.users') }}" class="admin-nav-link {% if request.endpoint in ['admin.users','admin.user_detail'] %}active{% endif %}">
+                <span class="nav-icon">&#9787;</span> Registered Users
+            </a>
+            <a href="{{ url_for('admin.categories') }}" class="admin-nav-link {% if 'categor' in request.endpoint|default('') %}active{% endif %}">
+                <span class="nav-icon">&#9776;</span> Video Categories
+            </a>
+            <a href="{{ url_for('admin.videos') }}" class="admin-nav-link {% if request.endpoint in ['admin.videos','admin.video_detail'] %}active{% endif %}">
+                <span class="nav-icon">&#9654;</span> Uploaded Videos
+            </a>
+
+            <div class="admin-nav-section">Detection Ops</div>
+            <a href="{{ url_for('admin.detections') }}" class="admin-nav-link {% if request.endpoint == 'admin.detections' %}active{% endif %}">
+                <span class="nav-icon">&#9881;</span> All Requests
+                {% if admin_counts.pending_detections %}<span class="nav-count">{{ admin_counts.pending_detections }}</span>{% endif %}
+            </a>
+            <a href="{{ url_for('admin.detections', status='pending') }}" class="admin-nav-link">
+                <span class="nav-icon">&#9203;</span> Pending
+            </a>
+            <a href="{{ url_for('admin.detections', status='completed') }}" class="admin-nav-link">
+                <span class="nav-icon">&#10003;</span> Completed
+            </a>
+            <a href="{{ url_for('admin.detections', status='failed') }}" class="admin-nav-link">
+                <span class="nav-icon">&#10007;</span> Failed
+            </a>
+            <a href="{{ url_for('admin.detection_results') }}" class="admin-nav-link {% if request.endpoint == 'admin.detection_results' %}active{% endif %}">
+                <span class="nav-icon">&#9783;</span> Detection Results
+            </a>
+
+            <div class="admin-nav-section">ML &amp; Dataset</div>
+            <a href="{{ url_for('admin.dataset') }}" class="admin-nav-link {% if 'dataset' in request.endpoint|default('') %}active{% endif %}">
+                <span class="nav-icon">&#128193;</span> Dataset Records
+            </a>
+            <a href="{{ url_for('admin.settings_frames') }}" class="admin-nav-link {% if request.endpoint == 'admin.settings_frames' %}active{% endif %}">
+                <span class="nav-icon">&#127902;</span> Frame Extraction
+            </a>
+            <a href="{{ url_for('admin.settings_frequency') }}" class="admin-nav-link {% if request.endpoint == 'admin.settings_frequency' %}active{% endif %}">
+                <span class="nav-icon">&#8761;</span> Frequency Processing
+            </a>
+            <a href="{{ url_for('admin.settings_transformer') }}" class="admin-nav-link {% if request.endpoint == 'admin.settings_transformer' %}active{% endif %}">
+                <span class="nav-icon">&#9889;</span> Transformer Model
+            </a>
+            <a href="{{ url_for('admin.model_status') }}" class="admin-nav-link {% if request.endpoint == 'admin.model_status' %}active{% endif %}">
+                <span class="nav-icon">&#129302;</span> Model Training
+            </a>
+
+            <div class="admin-nav-section">Communication</div>
+            <a href="{{ url_for('admin.feedback_list') }}" class="admin-nav-link {% if 'feedback' in request.endpoint|default('') %}active{% endif %}">
+                <span class="nav-icon">&#128172;</span> User Feedback
+                {% if admin_counts.pending_feedback %}<span class="nav-count">{{ admin_counts.pending_feedback }}</span>{% endif %}
+            </a>
+            <a href="{{ url_for('admin.contacts') }}" class="admin-nav-link {% if 'contact' in request.endpoint|default('') %}active{% endif %}">
+                <span class="nav-icon">&#9993;</span> Contact Queries
+                {% if admin_counts.pending_contacts %}<span class="nav-count">{{ admin_counts.pending_contacts }}</span>{% endif %}
+            </a>
+
+            <div class="admin-nav-section">Reports &amp; Logs</div>
+            <a href="{{ url_for('admin.logs') }}" class="admin-nav-link {% if request.endpoint == 'admin.logs' %}active{% endif %}">
+                <span class="nav-icon">&#128220;</span> System Logs
+            </a>
+            <a href="{{ url_for('admin.login_history') }}" class="admin-nav-link {% if request.endpoint == 'admin.login_history' %}active{% endif %}">
+                <span class="nav-icon">&#128274;</span> Login History
+            </a>
+            <a href="{{ url_for('admin.upload_history') }}" class="admin-nav-link {% if request.endpoint == 'admin.upload_history' %}active{% endif %}">
+                <span class="nav-icon">&#128228;</span> Upload History
+            </a>
+            <a href="{{ url_for('admin.detection_history') }}" class="admin-nav-link {% if request.endpoint == 'admin.detection_history' %}active{% endif %}">
+                <span class="nav-icon">&#128200;</span> Detection History
+            </a>
+            <a href="{{ url_for('admin.daily_report') }}" class="admin-nav-link {% if request.endpoint == 'admin.daily_report' %}active{% endif %}">
+                <span class="nav-icon">&#128197;</span> Daily Report
+            </a>
+            <a href="{{ url_for('admin.monthly_report') }}" class="admin-nav-link {% if request.endpoint == 'admin.monthly_report' %}active{% endif %}">
+                <span class="nav-icon">&#128198;</span> Monthly Report
+            </a>
+        </nav>
+
+        <div class="admin-sidebar-footer">
+            <a href="{{ url_for('main.index') }}">&#127968; View Public Site</a>
+            <a href="{{ url_for('auth.logout') }}">&#10140; Sign Out</a>
+        </div>
+    </aside>
+
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <div class="d-flex align-center gap-2">
+                <button class="mobile-menu-btn" id="adminMenuBtn" type="button">&#9776;</button>
+                <nav class="admin-breadcrumb">
+                    <a href="{{ url_for('admin.dashboard') }}">Admin</a>
+                    <span class="sep">/</span>
+                    <span class="current">{% block breadcrumb %}Dashboard{% endblock %}</span>
+                </nav>
+            </div>
+            <div class="admin-topbar-actions">
+                <span class="admin-topbar-pill">{{ now().strftime('%A, %d %b %Y') }}</span>
+                <a href="{{ url_for('admin.model_status') }}" class="btn btn-sm btn-outline">ML Status</a>
+            </div>
+        </header>
+
+        <main class="admin-page">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

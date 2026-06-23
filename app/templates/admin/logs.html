@@ -1,0 +1,25 @@
+{% extends "admin/base.html" %}
+{% block title %}System Logs{% endblock %}
+{% block breadcrumb %}System Logs{% endblock %}
+{% block content %}
+<div class="admin-page-header"><h1>View System Logs</h1><p>Complete audit trail of system events, user actions, and administrative operations.</p></div>
+<div class="admin-card"><div class="admin-card-body" style="padding:0;">
+    {% if pagination.items %}
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead><tr><th>Log ID</th><th>Type</th><th>Action</th><th>Details</th><th>User ID</th><th>IP Address</th><th>Timestamp</th></tr></thead>
+            <tbody>{% for log in pagination.items %}<tr>
+                <td><strong>#{{ log.id }}</strong></td>
+                <td><span class="admin-pill neutral">{{ log.log_type }}</span></td>
+                <td><strong>{{ log.action }}</strong></td>
+                <td class="text-muted">{{ log.details or '—' }}</td>
+                <td>{{ log.user_id or '—' }}</td>
+                <td>{{ log.ip_address or '—' }}</td>
+                <td>{{ log.created_at.strftime('%d %b %Y, %H:%M:%S') }}</td>
+            </tr>{% endfor %}</tbody>
+        </table>
+    </div>
+    {% if pagination.pages > 1 %}<div class="pagination" style="padding:1rem;">{% for p in pagination.iter_pages() %}{% if p %}<a href="?page={{ p }}" class="{{ 'active' if p==pagination.page }}">{{ p }}</a>{% endif %}{% endfor %}</div>{% endif %}
+    {% else %}<div class="empty-state"><div class="empty-icon">&#128220;</div><h4>No logs recorded</h4></div>{% endif %}
+</div></div>
+{% endblock %}

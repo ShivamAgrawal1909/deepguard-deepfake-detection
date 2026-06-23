@@ -1,0 +1,37 @@
+{% extends "admin/base.html" %}
+{% block title %}Detection Requests{% endblock %}
+{% block breadcrumb %}Detection Requests{% endblock %}
+{% block content %}
+<div class="admin-page-header">
+    <div class="header-row">
+        <div><h1>Manage Detection Requests</h1><p>Monitor and review all deepfake detection requests across the platform.</p></div>
+        <div class="d-flex gap-1">
+            <a href="{{ url_for('admin.detections', status='all') }}" class="btn btn-sm {{ 'btn-primary' if status=='all' else 'btn-outline' }}">All</a>
+            <a href="{{ url_for('admin.detections', status='pending') }}" class="btn btn-sm {{ 'btn-primary' if status=='pending' else 'btn-outline' }}">Pending</a>
+            <a href="{{ url_for('admin.detections', status='completed') }}" class="btn btn-sm {{ 'btn-primary' if status=='completed' else 'btn-outline' }}">Completed</a>
+            <a href="{{ url_for('admin.detections', status='failed') }}" class="btn btn-sm {{ 'btn-primary' if status=='failed' else 'btn-outline' }}">Failed</a>
+        </div>
+    </div>
+</div>
+<div class="admin-card"><div class="admin-card-body" style="padding:0;">
+    {% if pagination.items %}
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead><tr><th>Request ID</th><th>User</th><th>Type</th><th>Result</th><th>Confidence</th><th>Status</th><th>Submitted</th><th>Completed</th><th>Actions</th></tr></thead>
+            <tbody>{% for d in pagination.items %}<tr>
+                <td><strong>#{{ '%04d'|format(d.id) }}</strong></td>
+                <td><a href="{{ url_for('admin.user_detail', user_id=d.user.id) }}">{{ d.user.username }}</a></td>
+                <td>{{ d.request_type|capitalize }}</td>
+                <td>{% if d.result_label %}<span class="admin-pill {{ d.result_label }}">{{ d.result_label|upper }}</span>{% else %}—{% endif %}</td>
+                <td>{% if d.confidence %}<strong>{{ d.confidence }}%</strong>{% else %}—{% endif %}</td>
+                <td><span class="admin-pill {{ d.status }}">{{ d.status }}</span></td>
+                <td>{{ d.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+                <td>{{ d.completed_at.strftime('%d %b %Y, %H:%M') if d.completed_at else '—' }}</td>
+                <td><a href="{{ url_for('admin.detection_detail', det_id=d.id) }}" class="btn btn-sm btn-primary">View Report</a></td>
+            </tr>{% endfor %}</tbody>
+        </table>
+    </div>
+    {% if pagination.pages > 1 %}<div class="pagination" style="padding:1rem;">{% for p in pagination.iter_pages() %}{% if p %}<a href="?page={{ p }}&status={{ status }}" class="{{ 'active' if p==pagination.page }}">{{ p }}</a>{% endif %}{% endfor %}</div>{% endif %}
+    {% else %}<div class="empty-state"><div class="empty-icon">&#9881;</div><h4>No detection requests</h4></div>{% endif %}
+</div></div>
+{% endblock %}

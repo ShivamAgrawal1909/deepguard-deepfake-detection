@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %} | DeepGuard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="user-layout">
+<div class="dashboard-layout">
+    <aside class="user-sidebar" id="userSidebar">
+        <div class="user-sidebar-brand">
+            <a href="{{ url_for('user.dashboard') }}">Deep<span>Guard</span></a>
+            <small>User Portal</small>
+        </div>
+
+        <div class="user-profile-card d-flex gap-2 align-center">
+            <div class="user-avatar">{{ (current_user.full_name or current_user.username)[:2]|upper }}</div>
+            <div class="profile-info">
+                <h4>{{ current_user.full_name or current_user.username }}</h4>
+                <p>{{ current_user.email }}</p>
+            </div>
+        </div>
+
+        <nav class="user-nav">
+            <div class="user-nav-section">Overview</div>
+            <a href="{{ url_for('user.dashboard') }}" class="user-nav-link {% if request.endpoint == 'user.dashboard' %}active{% endif %}">
+                <span class="nav-icon">&#9632;</span> Dashboard
+            </a>
+
+            <div class="user-nav-section">Account</div>
+            <a href="{{ url_for('user.profile') }}" class="user-nav-link {% if request.endpoint == 'user.profile' %}active{% endif %}">
+                <span class="nav-icon">&#9679;</span> My Profile
+            </a>
+            <a href="{{ url_for('user.change_password') }}" class="user-nav-link {% if request.endpoint == 'user.change_password' %}active{% endif %}">
+                <span class="nav-icon">&#9919;</span> Change Password
+            </a>
+
+            <div class="user-nav-section">Detection</div>
+            <a href="{{ url_for('user.upload_video') }}" class="user-nav-link {% if request.endpoint in ['user.upload_video','user.video_preview'] %}active{% endif %}">
+                <span class="nav-icon">&#128228;</span> Upload Video
+            </a>
+            <a href="{{ url_for('user.detect_image') }}" class="user-nav-link {% if request.endpoint == 'user.detect_image' %}active{% endif %}">
+                <span class="nav-icon">&#128247;</span> Image Detection
+            </a>
+            <a href="{{ url_for('user.my_videos') }}" class="user-nav-link {% if request.endpoint == 'user.my_videos' %}active{% endif %}">
+                <span class="nav-icon">&#9654;</span> My Videos
+            </a>
+            <a href="{{ url_for('user.history') }}" class="user-nav-link {% if request.endpoint in ['user.history','user.detection_result'] %}active{% endif %}">
+                <span class="nav-icon">&#128203;</span> Detection History
+            </a>
+
+            <div class="user-nav-section">Resources</div>
+            <a href="{{ url_for('main.guidelines') }}" class="user-nav-link" target="_blank">
+                <span class="nav-icon">&#128196;</span> Upload Guidelines
+            </a>
+            <a href="{{ url_for('main.awareness') }}" class="user-nav-link" target="_blank">
+                <span class="nav-icon">&#128161;</span> Deepfake Awareness
+            </a>
+
+            <div class="user-nav-section">Support</div>
+            <a href="{{ url_for('user.feedback') }}" class="user-nav-link {% if request.endpoint == 'user.feedback' %}active{% endif %}">
+                <span class="nav-icon">&#128172;</span> Feedback
+            </a>
+            <a href="{{ url_for('user.contact') }}" class="user-nav-link {% if request.endpoint == 'user.contact' %}active{% endif %}">
+                <span class="nav-icon">&#9993;</span> Contact Support
+            </a>
+        </nav>
+
+        <div class="user-sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}">&#10140; Sign Out</a>
+        </div>
+    </aside>
+
+    <div class="user-main">
+        <header class="user-topbar">
+            <div class="d-flex align-center gap-2">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">&#9776;</button>
+                <nav class="user-breadcrumb">
+                    <a href="{{ url_for('user.dashboard') }}">Portal</a>
+                    <span class="sep">/</span>
+                    <span class="current">{% block breadcrumb %}Dashboard{% endblock %}</span>
+                </nav>
+            </div>
+            <div class="user-topbar-actions">
+                <span class="user-topbar-date">{{ now().strftime('%A, %B %d, %Y') if now is defined else '' }}</span>
+                <a href="{{ url_for('user.upload_video') }}" class="btn btn-primary btn-sm">+ New Detection</a>
+            </div>
+        </header>
+
+        <main class="user-page">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/user.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

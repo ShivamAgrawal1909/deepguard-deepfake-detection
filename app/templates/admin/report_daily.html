@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+{% block title %}Daily Report{% endblock %}
+{% block breadcrumb %}Daily Report{% endblock %}
+{% block content %}
+<div class="admin-page-header">
+    <div class="header-row">
+        <div><h1>Daily Activity Report</h1><p>System activity summary for {{ date.strftime('%A, %B %d, %Y') }}.</p></div>
+        <a href="{{ url_for('admin.monthly_report') }}" class="btn btn-outline btn-sm">Monthly Report</a>
+    </div>
+</div>
+<div class="admin-stats">
+    <div class="admin-stat-card" style="--stat-color:#6366f1;"><div class="stat-label">Logins Today</div><div class="stat-value">{{ data.logins }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#8b5cf6;"><div class="stat-label">Uploads Today</div><div class="stat-value">{{ data.uploads }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#2563eb;"><div class="stat-label">Detections Started</div><div class="stat-value">{{ data.detections }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#059669;"><div class="stat-label">Completed Today</div><div class="stat-value">{{ data.completed }}</div></div>
+    <div class="admin-stat-card" style="--stat-color:#d97706;"><div class="stat-label">Feedback Received</div><div class="stat-value">{{ data.feedback }}</div></div>
+</div>
+<div class="admin-card"><div class="admin-card-header"><h3>Report Summary</h3></div><div class="admin-card-body detail-list">
+    <div class="detail-row"><span class="label">Report Date</span><span class="value">{{ date.strftime('%d %B %Y') }}</span></div>
+    <div class="detail-row"><span class="label">Total Login Events</span><span class="value">{{ data.logins }}</span></div>
+    <div class="detail-row"><span class="label">Files Uploaded</span><span class="value">{{ data.uploads }}</span></div>
+    <div class="detail-row"><span class="label">Detection Requests</span><span class="value">{{ data.detections }}</span></div>
+    <div class="detail-row"><span class="label">Successful Completions</span><span class="value">{{ data.completed }}</span></div>
+    <div class="detail-row"><span class="label">New Feedback Items</span><span class="value">{{ data.feedback }}</span></div>
+</div></div>
+{% endblock %}

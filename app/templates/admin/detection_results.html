@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% block title %}Detection Results{% endblock %}
+{% block breadcrumb %}Detection Results{% endblock %}
+{% block content %}
+<div class="admin-page-header">
+    <div class="header-row">
+        <div><h1>Detection Results Overview</h1><p>View all completed detection results classified as real or fake media.</p></div>
+        <div class="d-flex gap-1">
+            <a href="{{ url_for('admin.detection_results', label='all') }}" class="btn btn-sm {{ 'btn-primary' if label=='all' else 'btn-outline' }}">All</a>
+            <a href="{{ url_for('admin.detection_results', label='real') }}" class="btn btn-sm {{ 'btn-primary' if label=='real' else 'btn-outline' }}">Real</a>
+            <a href="{{ url_for('admin.detection_results', label='fake') }}" class="btn btn-sm {{ 'btn-primary' if label=='fake' else 'btn-outline' }}">Fake</a>
+        </div>
+    </div>
+</div>
+<div class="admin-card"><div class="admin-card-body" style="padding:0;">
+    {% if results %}
+    <table class="admin-table">
+        <thead><tr><th>ID</th><th>User</th><th>Type</th><th>Result</th><th>Confidence</th><th>Completed</th><th>Report</th><th>Actions</th></tr></thead>
+        <tbody>{% for r in results %}<tr>
+            <td><strong>#{{ '%04d'|format(r.id) }}</strong></td>
+            <td>{{ r.user.username }}</td><td>{{ r.request_type|capitalize }}</td>
+            <td><span class="admin-pill {{ r.result_label }}">{{ r.result_label|upper }}</span></td>
+            <td><strong>{{ r.confidence }}%</strong></td>
+            <td>{{ r.completed_at.strftime('%d %b %Y, %H:%M') if r.completed_at else '—' }}</td>
+            <td>{% if r.report_path %}<a href="{{ url_for('admin.download_report', det_id=r.id) }}" class="btn btn-sm btn-outline">PDF</a>{% else %}—{% endif %}</td>
+            <td><a href="{{ url_for('admin.detection_detail', det_id=r.id) }}" class="btn btn-sm btn-primary">Full Report</a></td>
+        </tr>{% endfor %}</tbody>
+    </table>
+    {% else %}<div class="empty-state"><div class="empty-icon">&#9783;</div><h4>No results found</h4></div>{% endif %}
+</div></div>
+{% endblock %}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DeepGuard - Deepfake Detection{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('main.index') }}" class="navbar-brand">
+            &#128274; Deep<span>Guard</span>
+        </a>
+        <ul class="navbar-nav">
+            <li><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li><a href="{{ url_for('main.about') }}">About</a></li>
+            <li><a href="{{ url_for('main.awareness') }}">Awareness</a></li>
+            <li><a href="{{ url_for('main.guidelines') }}">Guidelines</a></li>
+            <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
+            {% if current_user.is_authenticated %}
+                {% if current_user.is_admin %}
+                    <li><a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary btn-sm">Dashboard</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('user.dashboard') }}" class="btn btn-primary btn-sm">Dashboard</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                <li><a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div style="max-width:1200px;margin:1rem auto;padding:0 2rem;">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+    <footer class="footer">
+        <div class="footer-grid">
+            <div>
+                <h4>&#128274; DeepGuard</h4>
+                <p>Advanced deepfake detection using frequency-domain analysis and transformer-based machine learning models.</p>
+            </div>
+            <div>
+                <h4>Quick Links</h4>
+                <a href="{{ url_for('main.about') }}">About Us</a>
+                <a href="{{ url_for('main.guidelines') }}">Upload Guidelines</a>
+                <a href="{{ url_for('main.awareness') }}">Deepfake Awareness</a>
+            </div>
+            <div>
+                <h4>Get Started</h4>
+                <a href="{{ url_for('auth.register') }}">Create Account</a>
+                <a href="{{ url_for('auth.login') }}">Login</a>
+            </div>
+        </div>
+        <div class="footer-bottom">&copy; 2024 DeepGuard. All rights reserved. No third-party APIs used.</div>
+    </footer>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
