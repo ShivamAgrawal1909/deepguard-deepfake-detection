@@ -581,5 +581,5 @@ This project does **not** use any third-party API. All deepfake detection proces
 
 ## License
 
-Educational project — **Deepfake Detection Using Frequency-Domain and Transformer Models**.
+Educational project — **Deepfake Detection Using Frequency-Domain and Transformer Models**.                                  
 Licensed under the MIT License.
