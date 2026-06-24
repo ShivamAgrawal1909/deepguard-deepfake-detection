@@ -1,3 +1,12 @@
+---
+title: DeepGuard Deepfake Detection
+emoji: 🛡️
+colorFrom: blue
+colorTo: red
+sdk: docker
+pinned: false
+---
+
 # DeepGuard — Deepfake Detection Using Frequency-Domain and Transformer Models
 
 **DeepGuard** is a full-stack web application for detecting deepfake videos and images. It combines **frequency-domain signal processing** with a **PyTorch transformer encoder** to classify media as real or fake. All detection processing runs **locally on the server** — no third-party APIs are used.
