@@ -15,4 +15,4 @@ COPY . .
 
 EXPOSE 7860
 
-CMD ["python", "run.py"]
+CMD python seed.py && python run.py
