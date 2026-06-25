@@ -1,10 +1,7 @@
 ---
 title: DeepGuard Deepfake Detection
-emoji: 🛡️
-colorFrom: blue
-colorTo: red
 sdk: docker
-pinned: false
+app_port: 7860
 ---
 
 # DeepGuard — Deepfake Detection Using Frequency-Domain and Transformer Models
